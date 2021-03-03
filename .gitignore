@@ -1,2 +1,7 @@
 *.root
 /plots
+/output
+/comparePythia8AndHerwig7
+*.d
+*.pcm
+*.iso
