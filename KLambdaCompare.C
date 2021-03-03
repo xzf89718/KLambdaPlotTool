@@ -127,31 +127,29 @@ void KLambdaCompare( ) {
         // Add base names
         base_names.push_back("hhttbbKL1p0");
         base_names.push_back("hhttbbKL2p0from1p0");
-        base_names.push_back("hhttbbKL3p0from1p0");
-        base_names.push_back("hhttbbKL5p0from1p0");
-        base_names.push_back("hhttbbKL10p0");
-        base_names.push_back("hhttbbKL20p0from1p0");
-        base_names.push_back("hhttbbKL0p0from1p0");
-        base_names.push_back("hhttbbKLn1p0from1p0");
-        base_names.push_back("hhttbbKLn3p0from1p0");
-        base_names.push_back("hhttbbKLn4p0from1p0");
-        base_names.push_back("hhttbbKLn5p0from1p0");
-        base_names.push_back("hhttbbKLn10p0from1p0");
-        base_names.push_back("hhttbbKLn15p0from1p0");
-        base_names.push_back("hhttbbKL1p0");
         base_names.push_back("hhttbbKL2p0from10p0");
+        base_names.push_back("hhttbbKL3p0from1p0");
         base_names.push_back("hhttbbKL3p0from10p0");
+        base_names.push_back("hhttbbKL5p0from1p0");
         base_names.push_back("hhttbbKL5p0from10p0");
         base_names.push_back("hhttbbKL10p0");
+        base_names.push_back("hhttbbKL20p0from1p0");
         base_names.push_back("hhttbbKL20p0from10p0");
+        base_names.push_back("hhttbbKL0p0from1p0");
         base_names.push_back("hhttbbKL0p0from10p0");
+        base_names.push_back("hhttbbKLn1p0from1p0");
         base_names.push_back("hhttbbKLn1p0from10p0");
+        base_names.push_back("hhttbbKLn3p0from1p0");
         base_names.push_back("hhttbbKLn3p0from10p0");
+        base_names.push_back("hhttbbKLn4p0from1p0");
         base_names.push_back("hhttbbKLn4p0from10p0");
+        base_names.push_back("hhttbbKLn5p0from1p0");
         base_names.push_back("hhttbbKLn5p0from10p0");
+        base_names.push_back("hhttbbKLn10p0from1p0");
         base_names.push_back("hhttbbKLn10p0from10p0");
+        base_names.push_back("hhttbbKLn15p0from1p0");
         base_names.push_back("hhttbbKLn15p0from10p0");
-        
+
         gStyle->SetOptStat(0);
         auto dir_py8 = (TDirectory*)KLReweight_py8->Get("Preselection");
         auto dir_herwig7 = (TDirectory*)KLReweight_herwig7->Get("Preselection");
