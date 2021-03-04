@@ -188,7 +188,7 @@ void GenerateKLambaSamples(const double KLambda)
                         //
                         auto h_cup = ( 200. / 171. - KLambda * 10. / 57. + pow(KLambda, 2) * 1 / 171) * (*h1)\
                                      + ((-2. / 9.0) + KLambda * 7. / 30. - pow(KLambda, 2) * 1. / 90. )* (*h10) \
-                                     + (1. / 19. - KLambda * 11. / 19. + pow(KLambda, 2) * 1. / 190. ) * (*h20);
+                                     + (1. / 19. - KLambda * 11. / 190. + pow(KLambda, 2) * 1. / 190. ) * (*h20);
                         h_cup.SetName(hist_name_reweighted.c_str());
 #ifdef DEBUG_KLREWEIGT
                         cout << "hist_name_reweighted: " << hist_name_reweighted << endl;
