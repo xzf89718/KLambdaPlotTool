@@ -192,10 +192,21 @@ void GenerateKLambaSamples(const double KLambda)
                         // Methods to obtain signal templates for HH signals with couplings variations
                         // We take KT = 1 here
                         //
-                        auto h_cup = ( 200. / 171. - KLambda * 10. / 57. + pow(KLambda, 2) * 1 / 171) * (*h1)\
-                                     + ((-2. / 9.0) + KLambda * 7. / 30. - pow(KLambda, 2) * 1. / 90. )* (*h10) \
-                                     + (1. / 19. - KLambda * 11. / 190. + pow(KLambda, 2) * 1. / 190. ) * (*h20);
-                        h_cup.SetName(hist_name_reweighted.c_str());
+//                        auto h_cup = ( 200. / 171. - KLambda * 10. / 57. + pow(KLambda, 2) * 1 / 171) * (*h1)\
+//                                     + ((-2. / 9.0) + KLambda * 7. / 30. - pow(KLambda, 2) * 1. / 90. )* (*h10) \
+//                                     + (1. / 19. - KLambda * 11. / 190. + pow(KLambda, 2) * 1. / 190. ) * (*h20);
+//                        h_cup.SetName(hist_name_reweighted.c_str());
+                        auto h_cup = new TH1F(*h1);
+                        h_cup->Sumw2();
+                        h_cup->Add(h1, h10, \
+                                200. / 171. - KLambda * 10. / 57. + pow(KLambda, 2) * 1 / 171, \
+                                (-2. / 9.0) + KLambda * 7. / 30. - pow(KLambda, 2) * 1. / 90.);
+                        auto h_cup_2 = new TH1F(*h_cup);
+                        h_cup_2->Sumw2();
+                        h_cup_2->Add(h_cup_2, h20,\
+                                    1,
+                                    1. / 19. - KLambda * 11. / 190. + pow(KLambda, 2) * 1. / 190.);
+                        h_cup_2->SetName(hist_name_reweighted.c_str());
 #ifdef DEBUG_KLREWEIGT
                         auto c1 = new TCanvas("c1", "c1");
                         h1->Draw();
@@ -207,7 +218,12 @@ void GenerateKLambaSamples(const double KLambda)
                         cout << "hist_name_reweighted: " << hist_name_reweighted << endl;
                         delete c1;
 #endif
-                        h_cup.Write();
+                        h_cup_2->Write();
+                        delete h1;
+                        delete h10;
+                        delete h20;
+                        delete h_cup_2;
+                        delete h_cup;
                 }
         }
 
