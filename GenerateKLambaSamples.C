@@ -39,10 +39,16 @@ void GenerateKLambaSamples(const double KLambda)
         // Transform input KLambda to string form, such as 1p00000
         std::string string_KLambda = std::to_string(KLambda);
         auto index_of_point = string_KLambda.find(".");
-        string_KLambda.replace(index_of_point, index_of_point, "p");
+        if(index_of_point != -1)
+                string_KLambda.replace(index_of_point, 1, "p");
         //for now, we only need 2 digit decimal
         string_KLambda = string_KLambda.substr(0, string_KLambda.length() - 4);
+        //if KLambda<0, we need to substitute the "-" with "n"
+        auto index_of_minus = string_KLambda.find("-");
+        if (index_of_minus != -1)
+                string_KLambda.replace(index_of_minus, 1, "n");
 
+        // STL containeers for variable, region and base
         vector<std::string> variable_names;
         vector<std::string> region_names;
         //vector<std::string> base_names;
@@ -118,7 +124,7 @@ void GenerateKLambaSamples(const double KLambda)
         base_info->Branch("base3", &base3, "base3/D");
         base_info->Fill();
         output_file->Write("base_info");
-        
+
         // Now only consider Preselection
         // vector<std::string> Dir_names;
         std::string dirName("Preselection");
@@ -137,7 +143,7 @@ void GenerateKLambaSamples(const double KLambda)
         }
         //
         output_file->cd(dirName.c_str());
-        
+
         // start to combine the histogram and writte ! 
         for (auto iter_variable = variable_names.begin(); iter_variable != variable_names.end(); iter_variable ++)
         {       
@@ -196,6 +202,6 @@ void GenerateKLambaSamples(const double KLambda)
                         h_cup.Write();
                 }
         }
-        
+
         return;
 }
