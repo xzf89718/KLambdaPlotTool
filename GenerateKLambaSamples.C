@@ -9,23 +9,30 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <cmath>
 
 #include "TROOT.h"
 #include "TFile.h"
 #include "TTree.h"
 #include "TH1F.h"
 #include "TList.h"
+#include "TDirectory.h"
+#include "TBranch.h"
 
 
-
-
-// 
+#define DEBUG_KLREWEIGT 1
 void GenerateKLambaSamples(const double KLambda)
 {   
         using std::cout;
         using std::endl;
         using std::cerr;
         using std::clog;
+        using std::pow;
+        // Base not reweight!
+        if (KLambda == 1.0 || KLambda == 10.0 || KLambda == 20.0)
+        {
+                clog << "KL equals to one of the base, skip KLambda = " << KLambda << endl;
+        }
 
         // A kindly remind here: dure to the limit of std:to_string, this program cant handle 
         // input more than 5 digit decimal
@@ -33,11 +40,13 @@ void GenerateKLambaSamples(const double KLambda)
         std::string string_KLambda = std::to_string(KLambda);
         auto index_of_point = string_KLambda.find(".");
         string_KLambda.replace(index_of_point, index_of_point, "p");
+        //for now, we only need 2 digit decimal
+        string_KLambda = string_KLambda.substr(0, string_KLambda.length() - 4);
 
         vector<std::string> variable_names;
         vector<std::string> region_names;
         //vector<std::string> base_names;
-        map<std::string, std::string> base_names;
+        std::map<std::string, std::string> base_names;
 
         //Add all variables to variable_names
         variable_names.push_back("mBB");
@@ -86,19 +95,30 @@ void GenerateKLambaSamples(const double KLambda)
         // base_names.push_back("hhttbbKL20p0from1p0");
         base_names.insert(std::pair<std::string, std::string>("20p0", "hhttbbKL20p0from10p0"));
 
-
-
         // HERE_IS_BASE_FILE
         auto base_file = new TFile("./output/KLReweight_py8.root", "READ");
-        auto output_file = new TFile("./output/KLRecoReweigt_py8.root", "UPDATE");
-        // auto output_file = new TFile("./output/KLRecoReweigt.root", "UPDATE");
-
-        // auto base_file = new TFile("./output/KLReweight.root", "READ");
         if (!base_file)
         {
                 cerr << "error: " << "Can't open basefile, Check HERE_IS_BASE!" << endl;
                 return;
         }
+        auto output_file = new TFile("./output/KLRecoReweigt_py8.root", "UPDATE");
+        if (!output_file)
+        {
+                cerr << "error: " << "Can't open outputfile, Check HERE_IS_BASE!" << endl;
+                return;
+        }
+        // write base infomation into the output_file
+        double base1 = 1;
+        double base2 = 10;
+        double base3 = 20;
+        auto base_info = new TTree("base_info", "base_info");
+        base_info->Branch("base1", &base1, "base1/D");
+        base_info->Branch("base2", &base2, "base2/D");
+        base_info->Branch("base3", &base3, "base3/D");
+        base_info->Fill();
+        output_file->Write("base_info");
+        
         // Now only consider Preselection
         // vector<std::string> Dir_names;
         std::string dirName("Preselection");
@@ -109,16 +129,17 @@ void GenerateKLambaSamples(const double KLambda)
                 return;
         }
 
-        // Create Preselection directory in outputfile and write histogram
-        if (!outputfile->Get(directory))
+        // Create Preselection directory in output_file and write histogram
+        if (!output_file->Get(dirName.c_str()))
         {
-                outputfile->mkdir(dirName);
+                output_file->mkdir(dirName.c_str());
                 clog << "Warning: Cant find Preselection in output file, mkdir!" << endl;
         }
         //
+        output_file->cd(dirName.c_str());
         
-        outputfile->cd(dirName);
-        for (auto iter_variable = variable_name.begin(); iter_variable != variable_name.end(); iter_variable ++)
+        // start to combine the histogram and writte ! 
+        for (auto iter_variable = variable_names.begin(); iter_variable != variable_names.end(); iter_variable ++)
         {       
                 for(auto iter_region = region_names.begin(); iter_region != region_names.end(); iter_region ++)
                 {
@@ -126,45 +147,55 @@ void GenerateKLambaSamples(const double KLambda)
                         auto hist_name_reweighted = base_names.at("base") + string_KLambda + "fromReco" + \
                                                     "_" + *iter_region + "_" + *iter_variable;
                         // Get three base histogram
-                        auto h0_name = base_names.at("0p0") + "_" + *iter_region + "_" + *iter_variable;
                         auto h1_name = base_names.at("1p0") + "_" + *iter_region + "_" + *iter_variable;
                         auto h10_name = base_names.at("10p0") + "_" + *iter_region + "_" + *iter_variable;
+                        auto h20_name = base_names.at("20p0") + "_" + *iter_region + "_" + *iter_variable;
 
-                        auto h0 = (TH1F*)dir_Preselection->Get(h0_name);
-                        auto h1 = (TH1F*)dir_Preselection->Get(h1_name);
-                        auto h10 = (TH1F*)dir_Preselection->Get(h10_name);
+                        auto h1 = (TH1F*)dir_Preselection->Get(h1_name.c_str());
+                        auto h10 = (TH1F*)dir_Preselection->Get(h10_name.c_str());
+                        auto h20 = (TH1F*)dir_Preselection->Get(h20_name.c_str());
 
-                        if(!h0)
+                        if(!h1)
                         {
                                 clog << "Warning: Cant find base histogram h0" << endl;
                         }
-                        if(!h1)
+                        if(!h10)
                         {
                                 clog << "Warning: Cant find base histogram h1" << endl;
                         }
-                        if(!h10)
+                        if(!h20)
                         {
                                 clog << "Warning: Cant find base histogram h10" << endl;
                         }
-                        if(!h0 || !h1 || !h10)
+                        if(!h1 || !h10 || !h20)
                         {        
+                                clog << "This histogram is not exist in the base_file, skip" << endl;
                                 continue;
                         }
-                        // Add h0, h1, h10 follow the fomula
+                        // Add h1, h10, h20 follow the fomula
                         //
+                        delete h1;
+                        delete h10;
+                        delete h20;
 
+                        h1 = (TH1F*)dir_Preselection->Get(h1_name.c_str())->Clone();
+                        h10 = (TH1F*)dir_Preselection->Get(h10_name.c_str())->Clone();
+                        h20 = (TH1F*)dir_Preselection->Get(h20_name.c_str())->Clone();
+
+                        // For more details about the method here, check Alessandra Betti's talk 
+                        // Methods to obtain signal templates for HH signals with couplings variations
+                        // We take KT = 1 here
+                        //
+                        auto h_cup = ( 200. / 171. - KLambda * 10. / 57. + pow(KLambda, 2) * 1 / 171) * (*h1)\
+                                     + ((-2. / 9.0) + KLambda * 7. / 30. - pow(KLambda, 2) * 1. / 90. )* (*h10) \
+                                     + (1. / 19. - KLambda * 11. / 19. + pow(KLambda, 2) * 1. / 190. ) * (*h20);
+                        h_cup.SetName(hist_name_reweighted.c_str());
+#ifdef DEBUG_KLREWEIGT
+                        cout << "hist_name_reweighted: " << hist_name_reweighted << endl;
+#endif
+                        h_cup.Write();
                 }
         }
-
+        
         return;
 }
-
-
-
-
-
-
-
-
-
-
