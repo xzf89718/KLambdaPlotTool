@@ -19,7 +19,7 @@
 #include "TDirectory.h"
 #include "TBranch.h"
 #include "TCanvas.h"
-
+#include "TColor.h"
 #define DEBUG_KLREWEIGT 1
 void GenerateKLambaSamples(const double KLambda)
 {   
@@ -212,8 +212,13 @@ void GenerateKLambaSamples(const double KLambda)
                         h1->Draw();
                         h10->Draw("SAME");
                         h20->Draw("SAME");
-                        h_cup.Draw("SAME");
+                        h_cup_2->Draw("SAME");
+                        h1->SetLineColor(kRed);
+                        h10->SetLineColor(kGreen);
+                        h20->SetLineColor(kRed + 10);
+                        h_cup_2->SetLineColor(kGreen + 10);
                         c1->BuildLegend();
+                        c1->SetLogy();
                         c1->SaveAs(("../output/plots/" + hist_name_reweighted + ".png").c_str());
                         cout << "hist_name_reweighted: " << hist_name_reweighted << endl;
                         delete c1;
