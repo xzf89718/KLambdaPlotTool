@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import numpy as np
-
+import sympy as sp
+import matplotlib.pyplot as plt
 def GetCrossSection(int_KLambda):
     """
     Calculate cross section using:
@@ -31,3 +32,17 @@ if __name__ == '__main__':
     array_ri = np.array(list_rightside)
     x = np.linalg.solve(array_co, array_ri)
     print(x)
+
+
+    # solve the equation
+    A,B,C=sp.symbols(['A', 'B','C'])
+    sigma1,sigma2,sigma3=sp.symbols(['sigma1','sigma2','sigma3'])
+    rst=sp.solve([A+B+C-sigma1, A+10*B+100*C-sigma2,A+20*B+400*C-sigma3],[A,B,C])
+    print(rst)
+
+    # Let's draw the Cross-section 
+    list_KLambda = np.linspace(-20, 20, 1000)
+    list_Cross = GetCrossSection(list_KLambda)
+
+    plt.plot(list_KLambda, list_Cross)
+    plt.show()
