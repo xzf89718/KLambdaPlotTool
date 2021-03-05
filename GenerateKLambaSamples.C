@@ -32,6 +32,7 @@ void GenerateKLambaSamples(const double KLambda)
         if (KLambda == 1.0 || KLambda == 10.0 || KLambda == 20.0)
         {
                 clog << "KL equals to one of the base, skip KLambda = " << KLambda << endl;
+                return;
         }
 
         // A kindly remind here: dure to the limit of std:to_string, this program cant handle 
@@ -213,14 +214,16 @@ void GenerateKLambaSamples(const double KLambda)
                                         1,
                                         k3);
                         h_cup_2->SetName(hist_name_reweighted.c_str());
+                        h_cup_2->SetTitle(hist_name_reweighted.c_str());
 #ifdef DEBUG_KLREWEIGT
                         std::ofstream debug_k;
                         debug_k.open("./output/All_k.txt",std::ios::app);
                         debug_k << "KLambda: " <<KLambda <<" k1: " << k1<<" k2: " << k2<<" k3: " <<k3 <<endl;
                         debug_k.close();
                         auto c1 = new TCanvas("c1", "c1");
-                        h1->Draw();
-                        h10->Draw("SAME");
+
+                        h10->Draw("");
+                        h1->Draw("SAME");
                         h20->Draw("SAME");
                         h_cup_2->Draw("SAME");
                         h1->SetLineColor(kRed);
