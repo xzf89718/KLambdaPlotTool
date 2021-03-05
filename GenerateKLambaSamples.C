@@ -45,7 +45,7 @@ void GenerateKLambaSamples(const double KLambda)
         //for now, we only need 2 digit decimal
         //string_KLambda = string_KLambda.substr(0, string_KLambda.length() - 4);
         // now, we noly need 1 digit decimal
-        string_KLambda = string_KLambda.substr(0, string_KLambda.length() - 4);
+        string_KLambda = string_KLambda.substr(0, string_KLambda.length() - 5);
         //if KLambda<0, we need to substitute the "-" with "n"
         auto index_of_minus = string_KLambda.find("-");
         if (index_of_minus != -1)

@@ -31,6 +31,7 @@
 #include "TList.h"
 #include "TLegend.h"
 
+#define DEBUG_COMPARE 1
 
 
 void KLambdaCompare( ) {
@@ -44,13 +45,14 @@ void KLambdaCompare( ) {
         std::string Dir = {"Preselection"};
         auto KLReweight_py8 = new TFile("./output/KLReweight_py8.root", "READ");
         auto KLReweight_herwig7 = new TFile("./output/KLReweight.root", "READ");
-        std::string output_path = {"./comparePythia8AndHerwig7"};
+        auto KLReweight_Reco = new TFile("./output/KLRecoReweigt_py8.root", "READ");
+        std::string output_path = {"./plotsForGenerateKL"};
         // Initialize STL containers, wich includes names of histograms
         std::vector<std::string> regions;
         std::vector<std::string> variables;
         std::map<std::string, int> rebin_factors;
         std::vector<std::string> base_names;
-
+        std::map<std::string, std::string> Reco_Basename;
 
         // Add regions
         regions.push_back("2tag2pjet_0ptv_LL_OS");
@@ -149,11 +151,26 @@ void KLambdaCompare( ) {
         base_names.push_back("hhttbbKLn10p0from10p0");
         base_names.push_back("hhttbbKLn15p0from1p0");
         base_names.push_back("hhttbbKLn15p0from10p0");
+        for(auto base_name = base_names.begin(); base_name != base_names.end();base_name++)
+        {       
+                if (*base_name == "hhttbbKL1p0" || *base_name == "hhttbbKL10p0" )
+                {
+                        Reco_Basename.insert(std::pair<std::string, std::string>(*base_name, *base_name));       
+                        continue;
+                }
+                std::string basename_reco(*base_name);
+                auto index_L = basename_reco.find("L");
+                auto index_f = basename_reco.find("f");
+                basename_reco = basename_reco.substr(0, index_f);
+                basename_reco.insert(basename_reco.length(), "fromReco");
+                cout << basename_reco << endl;
+                Reco_Basename.insert(std::pair<std::string, std::string>(*base_name, basename_reco));
 
+        }
         gStyle->SetOptStat(0);
         auto dir_py8 = (TDirectory*)KLReweight_py8->Get("Preselection");
         auto dir_herwig7 = (TDirectory*)KLReweight_herwig7->Get("Preselection");
-
+        auto dir_Reco = (TDirectory*)KLReweight_Reco->Get("Preselection");
         for (auto iter_basename = base_names.begin(); iter_basename != base_names.end(); iter_basename++)
         {
                 for (auto iter_variable = variables.begin(); iter_variable != variables.end(); iter_variable++)
@@ -161,15 +178,18 @@ void KLambdaCompare( ) {
                         for (auto iter_region = regions.begin(); iter_region != regions.end(); iter_region++)
                         {
                                 auto hist_name = *iter_basename + '_' + *iter_region + '_' + *iter_variable;
+                                auto hist_name_reco = Reco_Basename.at(*iter_basename) + '_' + *iter_region +"_"+ *iter_variable; 
                                 cout << hist_name << endl;
-                                if(!dir_py8->Get(hist_name.c_str()))
+                                cout << hist_name_reco << endl;
+                                if(!dir_py8->Get(hist_name.c_str()) || !dir_Reco->Get(hist_name_reco.c_str()))
                                 {
                                         cout << "hist_name not found, continue" << endl;
                                         continue;
                                 }
                                 auto h1 = (TH1F*)dir_py8->Get(hist_name.c_str())->Clone();
-                                auto h2 = (TH1F*)dir_herwig7->Get(hist_name.c_str())->Clone();
-                                //cout<< h1->GetNbinsX() <<endl;
+                                //auto h2 = (TH1F*)dir_herwig7->Get(hist_name.c_str())->Clone();
+                                auto h2 = (TH1F*)dir_Reco->Get(hist_name_reco.c_str())->Clone();
+                               //cout<< h1->GetNbinsX() <<endl;
                                 h1->Rebin(rebin_factors.at(*iter_variable));
                                 h2->Rebin(rebin_factors.at(*iter_variable));
 
@@ -185,13 +205,9 @@ void KLambdaCompare( ) {
                                 h1->SetStats(0);          // No statistics on upper plot
                                 h1->Draw();               // Draw h1
                                 h2->Draw("same");         // Draw h2 on top of h1
+                                pad1->BuildLegend();
                                 // Add legend for pad1
-                                auto legend1 = new TLegend(0.1, 0.7, 0.48, 0.9);
-                                legend1->SetHeader("Legend", "C");
-                                legend1->AddEntry(h1, "Pythia8", "f");
-                                legend1->AddEntry(h2, "Herwig7", "f");
-                                legend1->Draw();
-                                // Do not draw the Y axis label on the upper plot and redraw a small
+                               // Do not draw the Y axis label on the upper plot and redraw a small
                                 // axis instead, in order to avoid the first label (0) to be clipped.
                                 //h1->GetYaxis()->SetLabelSize(0.);
                                 // TGaxis *axis = new TGaxis( -5, 20, -5, 220, 20,220,510,"");
@@ -254,8 +270,6 @@ void KLambdaCompare( ) {
                                 h3->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
                                 h3->GetXaxis()->SetLabelSize(15);
 
-
-
                                 gPad->Update();
                                 c->SaveAs((output_path + "/" + hist_name + ".png").c_str());
                                 delete h1;
@@ -263,7 +277,7 @@ void KLambdaCompare( ) {
                                 delete h3;
                                 delete pad1;
                                 delete pad2;
-                                delete legend1;
+//                                delete legend1;
 
                                 delete c;
                         }
