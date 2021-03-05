@@ -37,8 +37,12 @@ if __name__ == '__main__':
     # solve the equation
     A,B,C=sp.symbols(['A', 'B','C'])
     sigma1,sigma2,sigma3=sp.symbols(['sigma1','sigma2','sigma3'])
+    kappa_lambda = sp.symbols(['kappa_lambda'])
     rst=sp.solve([A+B+C-sigma1, A+10*B+100*C-sigma2,A+20*B+400*C-sigma3],[A,B,C])
     print(rst)
+    # solve equation for kappa = 0, 1, 20
+    rst2=sp.solve([A-sigma1, A+B+C-sigma2, A+kappa_lambda*B+kappa_lambda*kappa_lambda*C-simga3], [A,B,C])
+    print(rst2)
 
     # Let's draw the Cross-section 
     list_KLambda = np.linspace(-20, 20, 1000)

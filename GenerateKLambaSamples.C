@@ -29,7 +29,7 @@ void GenerateKLambaSamples(const double KLambda)
         using std::clog;
         using std::pow;
         // Base not reweight!
-        if (KLambda == 1.0 || KLambda == 10.0 || KLambda == 20.0)
+        if (KLambda == 1.0 || KLambda == 0.0 || KLambda == 20.0)
         {
                 clog << "KL equals to one of the base, skip KLambda = " << KLambda << endl;
                 return;
@@ -103,7 +103,7 @@ void GenerateKLambaSamples(const double KLambda)
         base_names.insert(std::pair<std::string, std::string>("10p0", "hhttbbKL10p0"));
         // base_names.push_back("hhttbbKL20p0from1p0");
         base_names.insert(std::pair<std::string, std::string>("20p0", "hhttbbKL20p0from10p0"));
-
+        base_names.insert(std::pair<std::string, std::string>("0p0", "hhttbbKL0p0from1p0"));
         // HERE_IS_BASE_FILE
         auto base_file = new TFile("./output/KLReweight_py8.root", "READ");
         if (!base_file)
@@ -156,56 +156,63 @@ void GenerateKLambaSamples(const double KLambda)
                         auto hist_name_reweighted = base_names.at("base") + string_KLambda + "fromReco" + \
                                                     "_" + *iter_region + "_" + *iter_variable;
                         // Get three base histogram
+                        auto h0_name = base_names.at("0p0") + "_" + *iter_region + "_" + *iter_variable;
                         auto h1_name = base_names.at("1p0") + "_" + *iter_region + "_" + *iter_variable;
-                        auto h10_name = base_names.at("10p0") + "_" + *iter_region + "_" + *iter_variable;
                         auto h20_name = base_names.at("20p0") + "_" + *iter_region + "_" + *iter_variable;
 
+                        auto h0 = (TH1F*)dir_Preselection->Get(h0_name.c_str());
                         auto h1 = (TH1F*)dir_Preselection->Get(h1_name.c_str());
-                        auto h10 = (TH1F*)dir_Preselection->Get(h10_name.c_str());
                         auto h20 = (TH1F*)dir_Preselection->Get(h20_name.c_str());
 
-                        if(!h1)
+                        if(!h0)
                         {
                                 clog << "Warning: Cant find base histogram h0" << endl;
                         }
-                        if(!h10)
+                        if(!h1)
                         {
                                 clog << "Warning: Cant find base histogram h1" << endl;
                         }
                         if(!h20)
                         {
-                                clog << "Warning: Cant find base histogram h10" << endl;
+                                clog << "Warning: Cant find base histogram h20" << endl;
                         }
-                        if(!h1 || !h10 || !h20)
+                        if(!h0 || !h1 || !h20)
                         {        
                                 clog << "This histogram is not exist in the base_file, skip" << endl;
                                 continue;
                         }
                         // Add h1, h10, h20 follow the fomula
                         //
+                        delete h0;
                         delete h1;
-                        delete h10;
                         delete h20;
 
+                        h0 = (TH1F*)dir_Preselection->Get(h0_name.c_str())->Clone();
                         h1 = (TH1F*)dir_Preselection->Get(h1_name.c_str())->Clone();
-                        h10 = (TH1F*)dir_Preselection->Get(h10_name.c_str())->Clone();
                         h20 = (TH1F*)dir_Preselection->Get(h20_name.c_str())->Clone();
 
                         // For more details about the method here, check Alessandra Betti's talk 
                         // Methods to obtain signal templates for HH signals with couplings variations
                         // We take KT = 1 here
-                        //
-                        //                        auto h_cup = ( 200. / 171. - KLambda * 10. / 57. + pow(KLambda, 2) * 1 / 171) * (*h1)\
-                        //                                     + ((-2. / 9.0) + KLambda * 7. / 30. - pow(KLambda, 2) * 1. / 90. )* (*h10) \
-                        //                                     + (1. / 19. - KLambda * 11. / 190. + pow(KLambda, 2) * 1. / 190. ) * (*h20);
-                        //                        h_cup.SetName(hist_name_reweighted.c_str());
-                        auto h_cup = new TH1F(*h1);
+                       auto h_cup = new TH1F(*h0);
                         // here are the 3 coefficient
-                        double k1 = 200. / 171. - KLambda * 10. / 57. + pow(KLambda, 2) * 1 / 171;
-                        double k2 = (-2. / 9.0) + KLambda * 7. / 30. - pow(KLambda, 2) * 1. / 90.;
-                        double k3 = 1. / 19. - KLambda * 11. / 190. + pow(KLambda, 2) * 1. / 190.;
+//                        double k1 = 200. / 171. - KLambda * 10. / 57. + pow(KLambda, 2) * 1 / 171;
+//                        double k2 = (-2. / 9.0) + KLambda * 7. / 30. - pow(KLambda, 2) * 1. / 90.;
+//                        double k3 = 1. / 19. - KLambda * 11. / 190. + pow(KLambda, 2) * 1. / 190.;
+//                      
+
+                        // now consider kappa_t = 1, kappa_lambda
+                        // 
+                        auto Kappa_t = 1.0;
+                        auto k1 = Kappa_t * Kappa_t * \
+                                  ((pow(KLambda, 2) - KLambda) * pow(Kappa_t, 2) + \
+                                   (KLambda - 1) * pow(KLambda, 2) - (pow(KLambda, 2) -1) * KLambda * KLambda) / (pow(KLambda, 2) - KLambda);
+                        auto k2 = Kappa_t * Kappa_t * \
+                                  (pow(KLambda, 2) * Kappa_t * KLambda - KLambda * pow(KLambda, 2)) / (pow(KLambda, 2) - KLambda);
+                        auto k3 = Kappa_t * Kappa_t * \
+                                  (pow(KLambda, 2) - Kappa_t * KLambda) / (pow(KLambda, 2) - KLambda);
                         h_cup->Sumw2();
-                        h_cup->Add(h1, h10, \
+                        h_cup->Add(h0, h1, \
                                         k1,\
                                         k2);
                         auto h_cup_2 = new TH1F(*h_cup);
@@ -222,12 +229,12 @@ void GenerateKLambaSamples(const double KLambda)
                         debug_k.close();
                         auto c1 = new TCanvas("c1", "c1");
 
-                        h10->Draw("");
+                        h_cup_2->Draw("");
                         h1->Draw("SAME");
                         h20->Draw("SAME");
-                        h_cup_2->Draw("SAME");
-                        h1->SetLineColor(kRed);
-                        h10->SetLineColor(kGreen);
+                        h0->Draw("SAME");
+                        h0->SetLineColor(kRed);
+                        h1->SetLineColor(kGreen);
                         h20->SetLineColor(kRed + 2);
                         h_cup_2->SetLineColor(kGreen + 2);
                         c1->BuildLegend();
@@ -237,8 +244,8 @@ void GenerateKLambaSamples(const double KLambda)
                         delete c1;
 #endif
                         h_cup_2->Write();
+                        delete h0;
                         delete h1;
-                        delete h10;
                         delete h20;
                         delete h_cup_2;
                         delete h_cup;
