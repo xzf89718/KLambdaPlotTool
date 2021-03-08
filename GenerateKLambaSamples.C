@@ -20,6 +20,7 @@
 #include "TBranch.h"
 #include "TCanvas.h"
 #include "TColor.h"
+#include "TGraph.h"
 #define DEBUG_KLREWEIGT 1
 void GenerateKLambaSamples(const double KLambda)
 {   
@@ -194,12 +195,12 @@ void GenerateKLambaSamples(const double KLambda)
                         // For more details about the method here, check Alessandra Betti's talk 
                         // Methods to obtain signal templates for HH signals with couplings variations
                         // We take KT = 1 here
-                       auto h_cup = new TH1F(*h0);
+                        auto h_cup = new TH1F(*h0);
                         // here are the 3 coefficient
-//                        double k1 = 200. / 171. - KLambda * 10. / 57. + pow(KLambda, 2) * 1 / 171;
-//                        double k2 = (-2. / 9.0) + KLambda * 7. / 30. - pow(KLambda, 2) * 1. / 90.;
-//                        double k3 = 1. / 19. - KLambda * 11. / 190. + pow(KLambda, 2) * 1. / 190.;
-//                      
+                        //                        double k1 = 200. / 171. - KLambda * 10. / 57. + pow(KLambda, 2) * 1 / 171;
+                        //                        double k2 = (-2. / 9.0) + KLambda * 7. / 30. - pow(KLambda, 2) * 1. / 90.;
+                        //                        double k3 = 1. / 19. - KLambda * 11. / 190. + pow(KLambda, 2) * 1. / 190.;
+                        //                      
 
                         // now consider kappa_t = 1, kappa_lambda
                         // Edited by Zifeng at March, 8th, 2021, correct the k1, k2, k3 here, add lambda!
@@ -225,35 +226,6 @@ void GenerateKLambaSamples(const double KLambda)
                         h_cup_2->SetName(hist_name_reweighted.c_str());
                         h_cup_2->SetTitle(hist_name_reweighted.c_str());
 #ifdef DEBUG_KLREWEIGT  
-                        // here i want to show the error propagation!
-                        auto c2 = new TCanvas("c2", "c2");
-                        // Get 
-                        // create 3 TGraph to store error of 3 basis!
-                        auto NBinX = h0->GetNbinsX();
-                        auto error_0 = new float[NBinX];
-                        auto error_1 = new float[NBinX];
-                        auto error_20 = new float[NBinX];
-
-
-                        // create 1 TGraph to store error of combined one!
-                        auto error_reweight = new float[NBinX];
-                        auto error_calculated = new float[NBinX];
-
-
-                        for (auto i = 0; i < NBinX; i++)
-                        {
-                                error_0 = h0->GetBinError(i);
-                                error_1 = h1->GetBinError(i);
-                                error_20 = h20->GetBinError(i);
-                                
-                                // Get error of reweight one
-                                error_reweight = h_cup_2->GetBinError(i);
-                                // try to recalculate!
-                                //
-                                error_calculated = std::sqrt(pow(error_0 * k1, 2) + pow(error_1 * k2, 2) + pow(error_20 * k3, 2));
-
-                        }
-
 
                         std::ofstream debug_k;
                         debug_k.open("./output/All_k.txt",std::ios::app);
@@ -270,11 +242,98 @@ void GenerateKLambaSamples(const double KLambda)
                         h20->SetLineColor(kRed + 2);
                         h_cup_2->SetLineColor(kGreen + 2);
                         c1->BuildLegend();
-                       // c1->SetLogy();
+                        // c1->SetLogy();
                         c1->SaveAs(("./output/plots/" + hist_name_reweighted + ".pdf").c_str());
                         cout << "hist_name_reweighted: " << hist_name_reweighted << endl;
                         delete c1;
 #endif
+
+#ifdef DEBUG_KLREWEIGT
+                        // here i want to show the error propagation!
+                        auto c2 = new TCanvas("c2", "c2");
+                        // Get reweighted from basefile (truth-level) 
+                        auto hist_name_truth = base_names.at("base") + string_KLambda + "from1p0" + "_" + *iter_region + "_" + *iter_variable;
+                        cout << "DEBUG: " << hist_name_truth << endl;
+                        // create 3 TGraph to store error of 3 basis!
+                        auto NBinX = (Int_t)h0->GetNbinsX();
+                        auto error_0 = new float[NBinX];
+                        auto error_1 = new float[NBinX];
+                        auto error_20 = new float[NBinX];
+                        auto h_truth = (TH1F*)dir_Preselection->Get(hist_name_truth.c_str());
+                        auto error_truth = new float[NBinX];
+                        if(!h_truth)
+                        {
+                                clog << "Cant find h_truth, no h_truth has been added!" << endl;
+                                delete h_truth;
+                        }
+                        else
+                        {
+                            delete h_truth;
+                            h_truth = (TH1F*)dir_Preselection->Get(hist_name_truth.c_str())->Clone();
+                        }
+
+                        // create 1 TGraph to store error of combined one!
+                        auto error_reweight = new float[NBinX];
+                        auto error_calculated = new float[NBinX];
+
+                        // XAxis for TGraph
+                        auto x_for_tgraph = new float[NBinX];
+                        for (auto i = 0; i < NBinX; i++)
+                        {
+                                error_0[i]= h0->GetBinError(i);
+                                error_1[i] = h1->GetBinError(i);
+                                error_20[i] = h20->GetBinError(i);
+                                if(h_truth)
+                                        error_truth[i] = h_truth->GetBinError(i);
+                                // Get error of reweight one
+                                error_reweight[i] = h_cup_2->GetBinError(i);
+                                // try to recalculate!
+                                error_calculated[i] = std::sqrt(pow(error_0[i] * k1, 2) + pow(error_1[i] * k2, 2) + pow(error_20[i] * k3, 2));
+                                x_for_tgraph[i] = h0->GetBinCenter(i);
+
+                                cout << "cal: " <<error_calculated[i]<< " reweight: "<< error_reweight[i] << endl;
+
+                        }
+                        // Initialize TGraph for them
+                        auto g0 = new TGraph(NBinX, x_for_tgraph, error_0); g0->SetMarkerStyle(10);    
+                        auto g1 = new TGraph(NBinX, x_for_tgraph, error_1); g1->SetMarkerStyle(12);
+                        auto g20 = new TGraph(NBinX, x_for_tgraph, error_20); g20->SetMarkerStyle(14);
+                        auto gtruth = new TGraph(NBinX, x_for_tgraph, error_truth); gtruth->SetMarkerStyle(16);gtruth->SetMarkerColor(10);
+                        auto greweight = new TGraph(NBinX, x_for_tgraph, error_reweight); greweight->SetMarkerStyle(18);greweight->SetMarkerColor(14);
+                        auto gcalculated = new TGraph(NBinX, x_for_tgraph, error_calculated); gcalculated->SetMarkerStyle(20);gcalculated->SetMarkerColor(18);
+                        //g0->Draw();
+                        //g1->Draw("SAME");
+                        //g20->Draw("SAME");
+                        if(h_truth)
+                        {
+                                gtruth->Draw();
+                                greweight->Draw("SAME");
+                                gcalculated->Draw("SAME");
+                        }
+                        else
+                        {
+                                greweight->Draw();
+                                gcalculated->Draw("SAME");
+                        }
+                        c2->SaveAs(("./output/debug_plots/" + hist_name_reweighted + ".pdf").c_str());
+
+                        delete g0;
+                        delete g1;
+                        delete g20;
+                        delete gtruth;
+                        delete greweight;
+                        delete gcalculated;
+
+                        delete []x_for_tgraph;
+                        delete []error_0;
+                        delete []error_1;
+                        delete []error_20;
+                        delete []error_truth;
+                        delete []error_reweight;
+                        delete []error_calculated;
+                        delete c2;
+#endif
+
                         h_cup_2->Write();
                         delete h0;
                         delete h1;
