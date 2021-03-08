@@ -202,15 +202,17 @@ void GenerateKLambaSamples(const double KLambda)
 //                      
 
                         // now consider kappa_t = 1, kappa_lambda
-                        // 
+                        // Edited by Zifeng at March, 8th, 2021, correct the k1, k2, k3 here, add lambda!
                         auto Kappa_t = 1.0;
+                        // now switch to lambda = 20.0
+                        auto d_lambda = 20.0;
                         auto k1 = Kappa_t * Kappa_t * \
-                                  ((pow(KLambda, 2) - KLambda) * pow(Kappa_t, 2) + \
-                                   (KLambda - 1) * pow(KLambda, 2) - (pow(KLambda, 2) -1) * KLambda * KLambda) / (pow(KLambda, 2) - KLambda);
+                                  ((pow(d_lambda, 2) - d_lambda) * pow(Kappa_t, 2) + \
+                                   (d_lambda - 1) * pow(KLambda, 2) - (pow(d_lambda, 2) -1) * Kappa_t * KLambda) / (pow(d_lambda, 2) - d_lambda);
                         auto k2 = Kappa_t * Kappa_t * \
-                                  (pow(KLambda, 2) * Kappa_t * KLambda - KLambda * pow(KLambda, 2)) / (pow(KLambda, 2) - KLambda);
+                                  (pow(d_lambda, 2) * Kappa_t * KLambda - d_lambda * pow(KLambda, 2)) / (pow(d_lambda, 2) - d_lambda);
                         auto k3 = Kappa_t * Kappa_t * \
-                                  (pow(KLambda, 2) - Kappa_t * KLambda) / (pow(KLambda, 2) - KLambda);
+                                  (pow(KLambda, 2) - Kappa_t * KLambda) / (pow(d_lambda, 2) - d_lambda);
                         h_cup->Sumw2();
                         h_cup->Add(h0, h1, \
                                         k1,\

@@ -127,7 +127,7 @@ void KLambdaCompare( ) {
         rebin_factors.insert(std::pair<std::string, int>("dPhiTauTau", 4 ));
 
         // Add base names
-        base_names.push_back("hhttbbKL1p0");
+       // base_names.push_back("hhttbbKL1p0");
         base_names.push_back("hhttbbKL2p0from1p0");
         base_names.push_back("hhttbbKL2p0from10p0");
         base_names.push_back("hhttbbKL3p0from1p0");
@@ -135,10 +135,10 @@ void KLambdaCompare( ) {
         base_names.push_back("hhttbbKL5p0from1p0");
         base_names.push_back("hhttbbKL5p0from10p0");
         base_names.push_back("hhttbbKL10p0");
-        base_names.push_back("hhttbbKL20p0from1p0");
-        base_names.push_back("hhttbbKL20p0from10p0");
-        base_names.push_back("hhttbbKL0p0from1p0");
-        base_names.push_back("hhttbbKL0p0from10p0");
+        //base_names.push_back("hhttbbKL20p0from1p0");
+        //base_names.push_back("hhttbbKL20p0from10p0");
+        //base_names.push_back("hhttbbKL0p0from1p0");
+        //base_names.push_back("hhttbbKL0p0from10p0");
         base_names.push_back("hhttbbKLn1p0from1p0");
         base_names.push_back("hhttbbKLn1p0from10p0");
         base_names.push_back("hhttbbKLn3p0from1p0");
@@ -271,13 +271,12 @@ void KLambdaCompare( ) {
                                 h3->GetXaxis()->SetLabelSize(15);
 
                                 gPad->Update();
-                                c->SaveAs((output_path + "/" + hist_name + ".png").c_str());
+                                c->SaveAs((output_path + "/" + hist_name + ".df").c_str());
                                 delete h1;
                                 delete h2;
                                 delete h3;
                                 delete pad1;
                                 delete pad2;
-//                                delete legend1;
 
                                 delete c;
                         }
