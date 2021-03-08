@@ -18,7 +18,9 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <map>
+
 
 #include "TStyle.h"
 #include "TFile.h"
@@ -127,30 +129,113 @@ void KLambdaCompare( ) {
         rebin_factors.insert(std::pair<std::string, int>("dPhiTauTau", 4 ));
 
         // Add base names
-       // base_names.push_back("hhttbbKL1p0");
-        base_names.push_back("hhttbbKL2p0from1p0");
-        base_names.push_back("hhttbbKL2p0from10p0");
-        base_names.push_back("hhttbbKL3p0from1p0");
-        base_names.push_back("hhttbbKL3p0from10p0");
-        base_names.push_back("hhttbbKL5p0from1p0");
-        base_names.push_back("hhttbbKL5p0from10p0");
-        base_names.push_back("hhttbbKL10p0");
+        // base_names.push_back("hhttbbKL1p0");
+        // base_names.push_back("hhttbbKL2p0from1p0");
+        // base_names.push_back("hhttbbKL2p0from10p0");
+        // base_names.push_back("hhttbbKL3p0from1p0");
+        // base_names.push_back("hhttbbKL3p0from10p0");
+        // base_names.push_back("hhttbbKL5p0from1p0");
+        // base_names.push_back("hhttbbKL5p0from10p0");
+        // base_names.push_back("hhttbbKL10p0");
         //base_names.push_back("hhttbbKL20p0from1p0");
         //base_names.push_back("hhttbbKL20p0from10p0");
         //base_names.push_back("hhttbbKL0p0from1p0");
         //base_names.push_back("hhttbbKL0p0from10p0");
+        // base_names.push_back("hhttbbKLn1p0from1p0");
+        // base_names.push_back("hhttbbKLn1p0from10p0");
+        // base_names.push_back("hhttbbKLn3p0from1p0");
+        // base_names.push_back("hhttbbKLn3p0from10p0");
+        // base_names.push_back("hhttbbKLn4p0from1p0");
+        // base_names.push_back("hhttbbKLn4p0from10p0");
+        // base_names.push_back("hhttbbKLn5p0from1p0");
+        // base_names.push_back("hhttbbKLn5p0from10p0");
+        // base_names.push_back("hhttbbKLn10p0from1p0");
+        // base_names.push_back("hhttbbKLn10p0from10p0");
+        // base_names.push_back("hhttbbKLn15p0from1p0");
+        // base_names.push_back("hhttbbKLn15p0from10p0");
+        base_names.push_back("hhttbbKL0p0from1p0");
+        base_names.push_back("hhttbbKL0p0from10p0");
+        base_names.push_back("hhttbbKL1p0");
+        base_names.push_back("hhttbbKL2p0from1p0");
+        base_names.push_back("hhttbbKL2p0from10p0");
+        base_names.push_back("hhttbbKL3p0from1p0");
+        base_names.push_back("hhttbbKL3p0from10p0");
+        base_names.push_back("hhttbbKL4p0from1p0");
+        base_names.push_back("hhttbbKL4p0from10p0");
+        base_names.push_back("hhttbbKL5p0from1p0");
+        base_names.push_back("hhttbbKL5p0from10p0");
+        base_names.push_back("hhttbbKL6p0from1p0");
+        base_names.push_back("hhttbbKL6p0from10p0");
+        base_names.push_back("hhttbbKL7p0from1p0");
+        base_names.push_back("hhttbbKL7p0from10p0");
+        base_names.push_back("hhttbbKL8p0from1p0");
+        base_names.push_back("hhttbbKL8p0from10p0");
+        base_names.push_back("hhttbbKL9p0from1p0");
+        base_names.push_back("hhttbbKL9p0from10p0");
+        base_names.push_back("hhttbbKL10p0");
+        base_names.push_back("hhttbbKL11p0from1p0");
+        base_names.push_back("hhttbbKL11p0from10p0");
+        base_names.push_back("hhttbbKL12p0from1p0");
+        base_names.push_back("hhttbbKL12p0from10p0");
+        base_names.push_back("hhttbbKL13p0from1p0");
+        base_names.push_back("hhttbbKL13p0from10p0");
+        base_names.push_back("hhttbbKL14p0from1p0");
+        base_names.push_back("hhttbbKL14p0from10p0");
+        base_names.push_back("hhttbbKL15p0from1p0");
+        base_names.push_back("hhttbbKL15p0from10p0");
+        base_names.push_back("hhttbbKL16p0from1p0");
+        base_names.push_back("hhttbbKL16p0from10p0");
+        base_names.push_back("hhttbbKL17p0from1p0");
+        base_names.push_back("hhttbbKL17p0from10p0");
+        base_names.push_back("hhttbbKL18p0from1p0");
+        base_names.push_back("hhttbbKL18p0from10p0");
+        base_names.push_back("hhttbbKL19p0from1p0");
+        base_names.push_back("hhttbbKL19p0from10p0");
+        base_names.push_back("hhttbbKL20p0from1p0");
+        base_names.push_back("hhttbbKL20p0from10p0");
         base_names.push_back("hhttbbKLn1p0from1p0");
         base_names.push_back("hhttbbKLn1p0from10p0");
+        base_names.push_back("hhttbbKLn2p0from1p0");
+        base_names.push_back("hhttbbKLn2p0from10p0");
         base_names.push_back("hhttbbKLn3p0from1p0");
         base_names.push_back("hhttbbKLn3p0from10p0");
         base_names.push_back("hhttbbKLn4p0from1p0");
         base_names.push_back("hhttbbKLn4p0from10p0");
         base_names.push_back("hhttbbKLn5p0from1p0");
         base_names.push_back("hhttbbKLn5p0from10p0");
+        base_names.push_back("hhttbbKLn6p0from1p0");
+        base_names.push_back("hhttbbKLn6p0from10p0");
+        base_names.push_back("hhttbbKLn7p0from1p0");
+        base_names.push_back("hhttbbKLn7p0from10p0");
+        base_names.push_back("hhttbbKLn8p0from1p0");
+        base_names.push_back("hhttbbKLn8p0from10p0");
+        base_names.push_back("hhttbbKLn9p0from1p0");
+        base_names.push_back("hhttbbKLn9p0from10p0");
         base_names.push_back("hhttbbKLn10p0from1p0");
         base_names.push_back("hhttbbKLn10p0from10p0");
+        base_names.push_back("hhttbbKLn11p0from1p0");
+        base_names.push_back("hhttbbKLn11p0from10p0");
+        base_names.push_back("hhttbbKLn12p0from1p0");
+        base_names.push_back("hhttbbKLn12p0from10p0");
+        base_names.push_back("hhttbbKLn13p0from1p0");
+        base_names.push_back("hhttbbKLn13p0from10p0");
+        base_names.push_back("hhttbbKLn14p0from1p0");
+        base_names.push_back("hhttbbKLn14p0from10p0");
         base_names.push_back("hhttbbKLn15p0from1p0");
         base_names.push_back("hhttbbKLn15p0from10p0");
+        base_names.push_back("hhttbbKLn16p0from1p0");
+        base_names.push_back("hhttbbKLn16p0from10p0");
+        base_names.push_back("hhttbbKLn17p0from1p0");
+        base_names.push_back("hhttbbKLn17p0from10p0");
+        base_names.push_back("hhttbbKLn18p0from1p0");
+        base_names.push_back("hhttbbKLn18p0from10p0");
+        base_names.push_back("hhttbbKLn19p0from1p0");
+        base_names.push_back("hhttbbKLn19p0from10p0");
+        base_names.push_back("hhttbbKLn20p0from1p0");
+        base_names.push_back("hhttbbKLn20p0from10p0");
+
+
+
         for(auto base_name = base_names.begin(); base_name != base_names.end();base_name++)
         {       
                 if (*base_name == "hhttbbKL1p0" || *base_name == "hhttbbKL10p0" )
@@ -189,10 +274,9 @@ void KLambdaCompare( ) {
                                 auto h1 = (TH1F*)dir_py8->Get(hist_name.c_str())->Clone();
                                 //auto h2 = (TH1F*)dir_herwig7->Get(hist_name.c_str())->Clone();
                                 auto h2 = (TH1F*)dir_Reco->Get(hist_name_reco.c_str())->Clone();
-                               //cout<< h1->GetNbinsX() <<endl;
+                                //cout<< h1->GetNbinsX() <<endl;
                                 h1->Rebin(rebin_factors.at(*iter_variable));
                                 h2->Rebin(rebin_factors.at(*iter_variable));
-
                                 // Define the Canvas
                                 TCanvas *c = new TCanvas("c", "canvas", 800, 800);
 
@@ -207,7 +291,7 @@ void KLambdaCompare( ) {
                                 h2->Draw("same");         // Draw h2 on top of h1
                                 pad1->BuildLegend();
                                 // Add legend for pad1
-                               // Do not draw the Y axis label on the upper plot and redraw a small
+                                // Do not draw the Y axis label on the upper plot and redraw a small
                                 // axis instead, in order to avoid the first label (0) to be clipped.
                                 //h1->GetYaxis()->SetLabelSize(0.);
                                 // TGaxis *axis = new TGaxis( -5, 20, -5, 220, 20,220,510,"");
@@ -271,7 +355,7 @@ void KLambdaCompare( ) {
                                 h3->GetXaxis()->SetLabelSize(15);
 
                                 gPad->Update();
-                                c->SaveAs((output_path + "/" + hist_name + ".df").c_str());
+                                c->SaveAs((output_path + "/" + hist_name + ".pdf").c_str());
                                 delete h1;
                                 delete h2;
                                 delete h3;

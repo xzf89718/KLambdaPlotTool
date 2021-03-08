@@ -224,7 +224,36 @@ void GenerateKLambaSamples(const double KLambda)
                                         k3);
                         h_cup_2->SetName(hist_name_reweighted.c_str());
                         h_cup_2->SetTitle(hist_name_reweighted.c_str());
-#ifdef DEBUG_KLREWEIGT
+#ifdef DEBUG_KLREWEIGT  
+                        // here i want to show the error propagation!
+                        auto c2 = new TCanvas("c2", "c2");
+                        // create 3 TGraph to store error of 3 basis!
+                        auto NBinX = h0->GetNbinsX();
+                        auto error_0 = new float[NBinX];
+                        auto error_1 = new float[NBinX];
+                        auto error_20 = new float[NBinX];
+
+
+                        // create 1 TGraph to store error of combined one!
+                        auto error_reweight = new float[NBinX];
+                        auto error_calculated = new float[NBinX];
+
+
+                        for (auto i = 0; i < NBinX; i++)
+                        {
+                                error_0 = h0->GetBinError(i);
+                                error_1 = h1->GetBinError(i);
+                                error_20 = h20->GetBinError(i);
+                                
+                                // Get error of reweight one
+                                error_reweight = h_cup_2->GetBinError(i);
+                                // try to recalculate!
+                                //
+                                error_calculated = std::sqrt(pow(error_0 * k1, 2) + pow(error_1 * k2, 2) + pow(error_20 * k3, 2));
+
+                        }
+
+
                         std::ofstream debug_k;
                         debug_k.open("./output/All_k.txt",std::ios::app);
                         debug_k << "KLambda: " <<KLambda <<" k1: " << k1<<" k2: " << k2<<" k3: " <<k3 <<endl;

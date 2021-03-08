@@ -19,8 +19,13 @@ with open('variables_rebinfactor.txt', 'r') as file_object:
 
 
 print()
-list_number=['1p0', '2p0', '3p0', '5p0', '10p0', '20p0', '0p0', 'n1p0', 'n3p0', 'n4p0', 'n5p0', 'n10p0', 'n15p0']
+list_number=['0p0', '1p0', '2p0', '3p0', '4p0', '5p0', '6p0', '7p0', '8p0', '9p0', \
+        '10p0', '11p0', '12p0', '13p0', '14p0', '15p0', '16p0', '17p0', '18p0', '19p0', '20p0',\
+        '-1p0', '-2p0', '-3p0', '-4p0', '-5p0', '-6p0', '-7p0', '-8p0', '-9p0', \
+        '-10p0', '-11p0', '-12p0', '-13p0', '-14p0', '-15p0', '-16p0', '-17p0', '-18p0', '-19p0', '-20p0']
 for number in list_number:
+
+    number = number.replace('-', 'n')
     if number == '1p0':
         name = 'hhttbbKL' + number
         print('base_names.push_back(\"{}\");'.format(name))
