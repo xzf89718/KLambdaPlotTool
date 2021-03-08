@@ -227,6 +227,7 @@ void GenerateKLambaSamples(const double KLambda)
 #ifdef DEBUG_KLREWEIGT  
                         // here i want to show the error propagation!
                         auto c2 = new TCanvas("c2", "c2");
+                        // Get 
                         // create 3 TGraph to store error of 3 basis!
                         auto NBinX = h0->GetNbinsX();
                         auto error_0 = new float[NBinX];
