@@ -13,13 +13,18 @@ def GetCrossSection(int_KLambda):
 
     return 70.3874 - 50.4111 * int_KLambda  + 11.0595 * int_KLambda**2
 
+def Getkone(int_kappa_lambda):
+
+    return ((20**2 - 20) + (20 - 1) * int_kappa_lambda**2 - (20**2 -1)*int_kappa_lambda) / (20**2 -20)
+
 
 if __name__ == '__main__':
     output_string = "Cross Section for KLambda {0} is: {1}"
     list_KLambda = [1.0, 10.0, 20.0]
     for KLambda in list_KLambda:
         print(output_string.format(str(KLambda), GetCrossSection(KLambda)))
-
+    for i in range(-20, 20):
+        print(Getkone(i))
 
     # Solve the equation using numpy!
     # KT = 1
@@ -50,3 +55,7 @@ if __name__ == '__main__':
 
     plt.plot(list_KLambda, list_Cross)
     plt.show()
+
+
+    for i in range(-20, 20):
+        print(Getkone(i))

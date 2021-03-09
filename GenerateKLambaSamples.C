@@ -22,6 +22,8 @@
 #include "TColor.h"
 #include "TGraph.h"
 #include "TMultiGraph.h"
+#include "TStyle.h"
+#include "TLegend.h"
 #define DEBUG_KLREWEIGT 1
 void GenerateKLambaSamples(const double KLambda)
 {   
@@ -54,7 +56,7 @@ void GenerateKLambaSamples(const double KLambda)
                 string_KLambda.replace(index_of_minus, 1, "n");
 
         // STL containeers for variable, region and base
-                vector<std::string> variable_names;
+        vector<std::string> variable_names;
         vector<std::string> region_names;
         //vector<std::string> base_names;
         std::map<std::string, std::string> base_names;
@@ -252,6 +254,7 @@ void GenerateKLambaSamples(const double KLambda)
 #ifdef DEBUG_KLREWEIGT
                         // here i want to show the error propagation!
                         auto c2 = new TCanvas("c2", "c2");
+                        gROOT->SetStyle(0);
                         // Get reweighted from basefile (truth-level) 
                         auto hist_name_truth = base_names.at("base") + string_KLambda + "from1p0" + "_" + *iter_region + "_" + *iter_variable;
                         cout << "DEBUG: " << hist_name_truth << endl;
@@ -262,6 +265,9 @@ void GenerateKLambaSamples(const double KLambda)
                         auto error_20 = new float[NBinX];
                         auto h_truth = (TH1F*)dir_Preselection->Get(hist_name_truth.c_str());
                         auto error_truth = new float[NBinX];
+                        // validate error propagate in truth-reweight level!
+                        auto bincontent_1 = new float[NBinX];
+                        auto bincontent_truth = new float[NBinX];
                         if(!h_truth)
                         {
                                 clog << "Cant find h_truth, no h_truth has been added!" << endl;
@@ -283,40 +289,62 @@ void GenerateKLambaSamples(const double KLambda)
                         {
                                 error_0[i]= h0->GetBinError(i);
                                 error_1[i] = h1->GetBinError(i);
+                                bincontent_1[i] = h1->GetBinContent(i);
                                 error_20[i] = h20->GetBinError(i);
                                 if(h_truth)
+                                {
                                         error_truth[i] = h_truth->GetBinError(i);
+                                        bincontent_truth[i] = h_truth->GetBinContent(i);
+                                }
                                 // Get error of reweight one
                                 error_reweight[i] = h_cup_2->GetBinError(i);
                                 // try to recalculate!
                                 error_calculated[i] = std::sqrt(pow(error_0[i] * k1, 2) + pow(error_1[i] * k2, 2) + pow(error_20[i] * k3, 2));
                                 x_for_tgraph[i] = h0->GetBinCenter(i);
 
-                                cout << "cal: " <<error_calculated[i]<< " reweight: "<< error_reweight[i] << endl;
+                                cout << "cal error: " <<error_calculated[i]<< " reweighted error: "<< error_reweight[i] \
+                                        << " KL=1 error: " << error_1[i] << " propagate: " << bincontent_truth[i] / bincontent_1[i] \
+                                        <<" is it fit my assumption?" << (bincontent_truth[i]/bincontent_truth[i] * error_1[i] - error_truth[i]  < 0.00001) << endl;
 
                         }
                         // Initialize TGraph for them
-                        auto g0 = new TGraph(NBinX, x_for_tgraph, error_0); g0->SetMarkerStyle(10);    
-                        auto g1 = new TGraph(NBinX, x_for_tgraph, error_1); g1->SetMarkerStyle(12);
-                        auto g20 = new TGraph(NBinX, x_for_tgraph, error_20); g20->SetMarkerStyle(14);
-                        auto gtruth = new TGraph(NBinX, x_for_tgraph, error_truth); gtruth->SetMarkerStyle(16);gtruth->SetMarkerColor(10);
-                        auto greweight = new TGraph(NBinX, x_for_tgraph, error_reweight); greweight->SetMarkerStyle(18);greweight->SetMarkerColor(14);
-                        auto gcalculated = new TGraph(NBinX, x_for_tgraph, error_calculated); gcalculated->SetMarkerStyle(20);gcalculated->SetMarkerColor(18);
+                        auto g0 = new TGraph(NBinX, x_for_tgraph, error_0); g0->SetMarkerStyle(10); g0->SetName("g0");
+                        auto g1 = new TGraph(NBinX, x_for_tgraph, error_1); g1->SetMarkerStyle(12); g1->SetName("g1");
+                        auto g20 = new TGraph(NBinX, x_for_tgraph, error_20); g20->SetMarkerStyle(14); g20->SetName("g20");
+                        auto gtruth = new TGraph(NBinX, x_for_tgraph, error_truth); \
+                                      gtruth->SetMarkerStyle(21);gtruth->SetMarkerColor(2); gtruth->SetName("gtruth"); gtruth->SetTitle("gtruth");\
+                                      gtruth->SetDrawOption("AP");
+                        auto greweight = new TGraph(NBinX, x_for_tgraph, error_reweight); \
+                                         greweight->SetMarkerStyle(22);greweight->SetMarkerColor(4); greweight->SetName("greweight"); greweight->SetTitle("greweight");\
+                                         greweight->SetDrawOption("AP");
+                        auto gcalculated = new TGraph(NBinX, x_for_tgraph, error_calculated); \
+                                           gcalculated->SetMarkerStyle(23);gcalculated->SetMarkerColor(6); gcalculated->SetName("gcalculated"); gcalculated->SetTitle("gcalculated"); \
+                                           gcalculated->SetDrawOption("AP");
                         //g0->Draw();
                         //g1->Draw("SAME");
                         //g20->Draw("SAME");
                         // Let's try multigraph
+                        //
+                        auto mg = new TMultiGraph("mg", "");
                         if(h_truth)
                         {
-                                gtruth->Draw();
-                                greweight->Draw("SAME");
-                                gcalculated->Draw("SAME");
+                                mg->Add(gtruth);
+                                mg->Add(greweight);
+                                //mg->Add(greweight);
+                                //mg->Add(gcalculated);
+
                         }
                         else
                         {
-                                greweight->Draw();
-                                gcalculated->Draw("SAME");
+                                //mg->Add(gtruth);
+                                //mg->Add(gcalculated);
                         }
+                        mg->Draw("AP");
+                        gPad->Update();
+                        gPad->BuildLegend();
+                        mg->GetXaxis()->SetTitle((*iter_variable).c_str());
+                        mg->GetYaxis()->SetTitle("Events");
+                        gPad->Update();
                         c2->SaveAs(("./output/debug_plots/" + hist_name_reweighted + ".pdf").c_str());
 
                         delete g0;
@@ -325,6 +353,7 @@ void GenerateKLambaSamples(const double KLambda)
                         delete gtruth;
                         delete greweight;
                         delete gcalculated;
+                        delete mg;
 
                         delete []x_for_tgraph;
                         delete []error_0;
@@ -333,6 +362,8 @@ void GenerateKLambaSamples(const double KLambda)
                         delete []error_truth;
                         delete []error_reweight;
                         delete []error_calculated;
+                        delete []bincontent_truth;
+                        delete []bincontent_1;
                         delete c2;
 #endif
 
