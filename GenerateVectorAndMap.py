@@ -42,7 +42,9 @@ for number in list_number:
         name = 'hhttbbKL' + number + fromwhat 
         print('base_names.push_back(\"{}\");'.format(name))
 
+for number in list_number:
 
+    print(number.replace('-', 'n') + ' ', end='')
 
 print()
 list_number=['1p0', '10p0','20p0']

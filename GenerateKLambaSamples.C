@@ -21,6 +21,7 @@
 #include "TCanvas.h"
 #include "TColor.h"
 #include "TGraph.h"
+#include "TMultiGraph.h"
 #define DEBUG_KLREWEIGT 1
 void GenerateKLambaSamples(const double KLambda)
 {   
@@ -53,7 +54,7 @@ void GenerateKLambaSamples(const double KLambda)
                 string_KLambda.replace(index_of_minus, 1, "n");
 
         // STL containeers for variable, region and base
-        vector<std::string> variable_names;
+                vector<std::string> variable_names;
         vector<std::string> region_names;
         //vector<std::string> base_names;
         std::map<std::string, std::string> base_names;
@@ -209,7 +210,7 @@ void GenerateKLambaSamples(const double KLambda)
                         auto d_lambda = 20.0;
                         auto k1 = Kappa_t * Kappa_t * \
                                   ((pow(d_lambda, 2) - d_lambda) * pow(Kappa_t, 2) + \
-                                   (d_lambda - 1) * pow(KLambda, 2) - (pow(d_lambda, 2) -1) * Kappa_t * KLambda) / (pow(d_lambda, 2) - d_lambda);
+                                   (d_lambda - 1) * pow(KLambda, 2) - (pow(d_lambda, 2) -1.) * Kappa_t * KLambda) / (pow(d_lambda, 2) - d_lambda);
                         auto k2 = Kappa_t * Kappa_t * \
                                   (pow(d_lambda, 2) * Kappa_t * KLambda - d_lambda * pow(KLambda, 2)) / (pow(d_lambda, 2) - d_lambda);
                         auto k3 = Kappa_t * Kappa_t * \
@@ -268,8 +269,8 @@ void GenerateKLambaSamples(const double KLambda)
                         }
                         else
                         {
-                            delete h_truth;
-                            h_truth = (TH1F*)dir_Preselection->Get(hist_name_truth.c_str())->Clone();
+                                delete h_truth;
+                                h_truth = (TH1F*)dir_Preselection->Get(hist_name_truth.c_str())->Clone();
                         }
 
                         // create 1 TGraph to store error of combined one!
@@ -304,6 +305,7 @@ void GenerateKLambaSamples(const double KLambda)
                         //g0->Draw();
                         //g1->Draw("SAME");
                         //g20->Draw("SAME");
+                        // Let's try multigraph
                         if(h_truth)
                         {
                                 gtruth->Draw();
