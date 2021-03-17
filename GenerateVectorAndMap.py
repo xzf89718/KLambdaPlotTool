@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # Author: Zifeng Xu
 # Only use to Generate My Code
 # Warning: This is a Python3 script!

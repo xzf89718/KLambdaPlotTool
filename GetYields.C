@@ -15,6 +15,8 @@
 /// \author Paul Gessinger
 #include <vector>
 #include <string>
+#include <iostream>
+#include <fstream>
 #include "TFile.h"
 #include "TROOT.h"
 #include "TDirectory.h"
@@ -23,29 +25,46 @@
 
 void GetYields() 
 {
+    using std::cout;
+    using std::endl;
+    std::string Dir_name = {"Preselection"};
+    auto KLReweight_py8 = new TFile("./output/KLReweight_py8.root", "READ");
+    //auto KLReweight_herwig7 = new TFile("./output/KLReweight.root", "READ");
+    auto KLReco_py8 = new TFile("./output/KLRecoReweigt_py8.root","READ");
+    //std::string h1_name = {"hhttbbKL10p0from1p0_2tag2pjet_0ptv_LL_OS_mHH"}; 
+    //std::string h2_name = {"hhttbbKL5p0from1p0_2tag2pjet_0ptv_LL_OS_mHH"};
+    //std::string figure_name = {"./plots/test.pdf"};
 
-        std::string Dir_name = {"Preselection"};
-        auto KLReweight_py8 = new TFile("./output/KLReweight_py8.root", "READ");
-        auto KLReweight_herwig7 = new TFile("./output/KLReweight.aroot", "READ");
-        //std::string h1_name = {"hhttbbKL10p0from1p0_2tag2pjet_0ptv_LL_OS_mHH"}; 
-        //std::string h2_name = {"hhttbbKL5p0from1p0_2tag2pjet_0ptv_LL_OS_mHH"};
-        //std::string figure_name = {"./plots/test.pdf"};
-
-        auto dir = (TDirectory*)KLReweight_py8->Get(Dir_name.c_str());
-        
-        ofstream fout;
-        fout.open("./plots/Yields.txt", ios::app);
-        if(!fout)
+    auto dir = (TDirectory*)KLReweight_py8->Get(Dir_name.c_str());
+    auto dir_2 = (TDirectory*)KLReco_py8->Get(Dir_name.c_str());
+    std::ofstream fout;
+    std::ofstream fout2;
+    fout.open("./plots/Yields.txt", ios::app);
+    fout2.open("./plots/Yields_Reco.txt", ios::app);
+    if(!fout && !fout2)
+    {
+        cout<<"Cant open output file!"<<endl;
+    }
+    else
+    {       
+        for(auto &&hist_name: *(dir->GetListOfKeys()))
         {
-                cout<<"Cant open output file!"<<endl;
+            auto h1 = (TH1F*)dir->Get(hist_name->GetTitle());
+            fout <<"PY8 Yields: "<<hist_name->GetTitle() <<" "<< h1->Integral() <<endl;
+            delete h1;
         }
-        else
-        {       for(auto &&hist_name: *(dir->GetListOfKeys()))
-                {
-                    auto h1 = (TH1F*)dir->Get(hist_name->GetTitle());
-                    fout <<"PY8 Yields: "<<hist_name->GetTitle() <<" "<< h1->Integral() <<endl;
-        }       }
-        KLReweight_py8->Close();
-        KLReweight_herwig7->Close();
-        
+        for(auto &&hist_name: *(dir_2->GetListOfKeys()))
+        {
+            auto h1 = (TH1F*)dir_2->Get(hist_name->GetTitle());
+            if(h1)
+                fout2 <<"Reco Yields: "<<hist_name->GetTitle() <<" "<< h1->Integral() <<endl;
+            delete h1;
+        }
+    }
+
+    fout.close();
+    fout2.close();
+    KLReweight_py8->Close();
+    // KLReweight_herwig7->Close();
+    KLReco_py8->Close();
 }

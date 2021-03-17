@@ -109,7 +109,7 @@ void GenerateKLambaSamples(const double KLambda)
         base_names.insert(std::pair<std::string, std::string>("20p0", "hhttbbKL20p0from10p0"));
         base_names.insert(std::pair<std::string, std::string>("0p0", "hhttbbKL0p0from1p0"));
         // HERE_IS_BASE_FILE
-        auto base_file = new TFile("./output/KLReweight_py8.root", "READ");
+        auto base_file = new TFile("./output/KLReweight_py8_moreKLSignals.root", "READ");
         if (!base_file)
         {
                 cerr << "error: " << "Can't open basefile, Check HERE_IS_BASE!" << endl;
@@ -122,8 +122,8 @@ void GenerateKLambaSamples(const double KLambda)
                 return;
         }
         // write base infomation into the output_file
-        double base1 = 1;
-        double base2 = 10;
+        double base1 = 0;
+        double base2 = 1;
         double base3 = 20;
         auto base_info = new TTree("base_info", "base_info");
         base_info->Branch("base1", &base1, "base1/D");
@@ -229,7 +229,7 @@ void GenerateKLambaSamples(const double KLambda)
                         h_cup_2->SetName(hist_name_reweighted.c_str());
                         h_cup_2->SetTitle(hist_name_reweighted.c_str());
 #ifdef DEBUG_KLREWEIGT  
-
+                        gROOT->SetStyle("ATLAS");
                         std::ofstream debug_k;
                         debug_k.open("./output/All_k.txt",std::ios::app);
                         debug_k << "KLambda: " <<KLambda <<" k1: " << k1<<" k2: " << k2<<" k3: " <<k3 <<endl;
@@ -254,7 +254,7 @@ void GenerateKLambaSamples(const double KLambda)
 #ifdef DEBUG_KLREWEIGT
                         // here i want to show the error propagation!
                         auto c2 = new TCanvas("c2", "c2");
-                        gROOT->SetStyle(0);
+                        //gROOT->SetStyle(0);
                         // Get reweighted from basefile (truth-level) 
                         auto hist_name_truth = base_names.at("base") + string_KLambda + "from1p0" + "_" + *iter_region + "_" + *iter_variable;
                         cout << "DEBUG: " << hist_name_truth << endl;
@@ -312,10 +312,10 @@ void GenerateKLambaSamples(const double KLambda)
                         auto g1 = new TGraph(NBinX, x_for_tgraph, error_1); g1->SetMarkerStyle(12); g1->SetName("g1");
                         auto g20 = new TGraph(NBinX, x_for_tgraph, error_20); g20->SetMarkerStyle(14); g20->SetName("g20");
                         auto gtruth = new TGraph(NBinX, x_for_tgraph, error_truth); \
-                                      gtruth->SetMarkerStyle(21);gtruth->SetMarkerColor(2); gtruth->SetName("gtruth"); gtruth->SetTitle("gtruth");\
+                                      gtruth->SetMarkerStyle(21);gtruth->SetMarkerColor(2); gtruth->SetName("reweight_from_truth"); gtruth->SetTitle("reweigth_from_truth");\
                                       gtruth->SetDrawOption("AP");
                         auto greweight = new TGraph(NBinX, x_for_tgraph, error_reweight); \
-                                         greweight->SetMarkerStyle(22);greweight->SetMarkerColor(4); greweight->SetName("greweight"); greweight->SetTitle("greweight");\
+                                         greweight->SetMarkerStyle(22);greweight->SetMarkerColor(4); greweight->SetName("combine_at_reco-level"); greweight->SetTitle("combine_at_reco-level");\
                                          greweight->SetDrawOption("AP");
                         auto gcalculated = new TGraph(NBinX, x_for_tgraph, error_calculated); \
                                            gcalculated->SetMarkerStyle(23);gcalculated->SetMarkerColor(6); gcalculated->SetName("gcalculated"); gcalculated->SetTitle("gcalculated"); \
@@ -343,7 +343,7 @@ void GenerateKLambaSamples(const double KLambda)
                         gPad->Update();
                         gPad->BuildLegend();
                         mg->GetXaxis()->SetTitle((*iter_variable).c_str());
-                        mg->GetYaxis()->SetTitle("Events");
+                        mg->GetYaxis()->SetTitle("Error");
                         gPad->Update();
                         c2->SaveAs(("./output/debug_plots/" + hist_name_reweighted + ".pdf").c_str());
 
