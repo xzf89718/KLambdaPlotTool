@@ -8,3 +8,5 @@
 *.so
 /plotsForGenerateKL
 *.zip
+/test_signals
+/compare_truthreweights

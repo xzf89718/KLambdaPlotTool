@@ -4,7 +4,7 @@ import numpy as np
 
 def GetTruthK(KLambda):
     
-    return (70.3874 - 50.4111 * KLambda + 11.0595 * KLambda **2)# / (70.3874 - 50.4111 * 1. + 11.0595 * 1. **2)
+    return (70.3874 - 50.4111 * KLambda + 11.0595 * KLambda **2) / (70.3874 - 50.4111 * 1. + 11.0595 * 1. **2)
 
 def my_pow(KLambda, times):
     return KLambda ** times
@@ -27,19 +27,20 @@ list_combine = []
 list_k1 = []
 list_k2 = []
 list_k3 = []
-for i in np.linspace(-20., 20., 100):
+for i in np.linspace(-20., 30., 100):
     k1,k2,k3 = GetKs(i)
-    list_k1.append(k1 * GetTruthK(0.))
-    list_k2.append(k2 * GetTruthK(1.))
-    list_k3.append(k3 * GetTruthK(20.))
-    list_combine.append(np.sqrt((k1*GetTruthK(0.))**2 + (k2*GetTruthK(1.))**2 + (k3*GetTruthK(20.))**2))
+#    list_k1.append(k1 * GetTruthK(0.))
+#    list_k2.append(k2 * GetTruthK(1.))
+#    list_k3.append(k3 * GetTruthK(20.))
+#    list_combine.append(np.sqrt((k1*GetTruthK(0.))**2 + (k2*GetTruthK(1.))**2 + (k3*GetTruthK(20.))**2))
+
     list_kt.append(GetTruthK(i))
 
 # plt.plot(np.linspace(-20, 20, 100), list_k1, label='k1')
 # plt.plot(np.linspace(-20, 20, 100), list_k2, label='k2')
 # plt.plot(np.linspace(-20, 20, 100), list_k3, label='k3')
-plt.plot(np.linspace(-20, 20, 100), list_kt, label='kt')
-plt.plot(np.linspace(-20, 20, 100), list_combine, label='kcombined')
+plt.plot(np.linspace(-20, 30, 100), list_kt, label='kt')
+plt.plot(np.linspace(-20, 30, 100), list_combine, label='kcombined')
 plt.legend()
 plt.xlabel(r'$\kappa_{\lambda}$')
 plt.ylabel('Arbitrary Unit')

@@ -34,6 +34,8 @@
 #include "TList.h"
 #include "TLegend.h"
 
+
+
 #define DEBUG_COMPARE 1
 std::string transformFloat(float KLambda){
     // input: any float KLambda
@@ -258,7 +260,7 @@ void KLambdaCompare( ) {
     //    base_names.push_back("hhttbbKLn19p0from10p0");
     //    base_names.push_back("hhttbbKLn20p0from1p0");
     //    base_names.push_back("hhttbbKLn20p0from10p0");
-    
+
     // push_back basenames
     std::vector<std::string> vec_basenames = {"hhttbbKL"};
     std::vector<std::string> vec_fromname = {"from1p0", "from10p0"};
@@ -288,7 +290,6 @@ void KLambdaCompare( ) {
 
     }
 
-    gStyle->SetOptStat(0);
     auto dir_py8 = (TDirectory*)KLReweight_py8->Get("Preselection");
     auto dir_herwig7 = (TDirectory*)KLReweight_herwig7->Get("Preselection");
     auto dir_Reco = (TDirectory*)KLReweight_Reco->Get("Preselection");
@@ -315,18 +316,26 @@ void KLambdaCompare( ) {
                 h2->Rebin(rebin_factors.at(*iter_variable));
                 // Define the Canvas
                 TCanvas *c = new TCanvas("c", "canvas", 800, 800);
-
+                gROOT->SetStyle("ATLAS");
+                gStyle->SetOptStat(0);
                 // Upper plot will be in pad1
                 TPad *pad1 = new TPad("pad1", "pad1", 0, 0.3, 1, 1.0);
                 pad1->SetBottomMargin(1); // Upper and lower plot are joined
-                pad1->SetGridx();         // Vertical grid
+                // pad1->SetGridx();         // Vertical grid
                 pad1->Draw();             // Draw the upper pad: pad1
                 pad1->cd();               // pad1 becomes the current pad
                 h1->SetStats(0);          // No statistics on upper plot
-                h1->Draw();               // Draw h1
-                h2->Draw("same");         // Draw h2 on top of h1
-                pad1->BuildLegend();
-                // Add legend for pad1
+                h1->Draw("HIST E1");               // Draw h1
+                h2->Draw("HIST E1 SAME");         // Draw h2 on top of h1
+                // Create Legend for histogram!
+                //auto legend = new TLegend(0.7, 0.9, 0.48, 0.9);
+                auto legend = new TLegend(0.75, 0.8, 0.95, 0.95);
+                gStyle->SetLegendTextSize(0.02);
+                legend->AddEntry(h1, "truth_level");
+                legend->AddEntry(h2, "combine_at_reco_level");
+                legend->Draw();
+
+
                 // Do not draw the Y axis label on the upper plot and redraw a small
                 // axis instead, in order to avoid the first label (0) to be clipped.
                 //h1->GetYaxis()->SetLabelSize(0.);
@@ -336,7 +345,6 @@ void KLambdaCompare( ) {
                 // axis->Draw();
 
                 // lower plot will be in pad
-                gROOT->SetStyle("ATLAS");
                 c->cd();          // Go back to the main canvas before defining pad2
                 TPad *pad2 = new TPad("pad2", "pad2", 0, 0.05, 1, 0.3);
                 pad2->SetTopMargin(0);
@@ -399,7 +407,7 @@ void KLambdaCompare( ) {
                 h3->GetXaxis()->SetLabelSize(15);
 
                 gPad->Update();
-                c->SaveAs((output_path + "/" + hist_name + ".pdf").c_str());
+                c->SaveAs((output_path + "/" + hist_name + ".png").c_str());
                 delete h1;
                 delete h2;
                 delete h3;
