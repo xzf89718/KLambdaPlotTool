@@ -266,7 +266,7 @@ void KLambdaCompare( ) {
     std::vector<std::string> vec_fromname = {"from1p0", "from10p0"};
     for(auto base_name = vec_basenames.begin(); base_name != vec_basenames.end(); base_name++){
         for(auto from_name = vec_fromname.begin(); from_name != vec_fromname.end(); from_name++){   
-            for(float _KLambda=-20.0; _KLambda <= 20.0; _KLambda = _KLambda + 0.2){
+            for(float _KLambda=-20.001; _KLambda <= 20.0; _KLambda = _KLambda + 0.2){
                 auto _basename = *base_name + transformFloat(_KLambda) + *from_name;
                 base_names.push_back(_basename);
             }
@@ -301,11 +301,12 @@ void KLambdaCompare( ) {
             {
                 auto hist_name = *iter_basename + '_' + *iter_region + '_' + *iter_variable;
                 auto hist_name_reco = Reco_Basename.at(*iter_basename) + '_' + *iter_region +"_"+ *iter_variable; 
-                cout << hist_name << endl;
-                cout << hist_name_reco << endl;
                 if(!dir_py8->Get(hist_name.c_str()) || !dir_Reco->Get(hist_name_reco.c_str()))
                 {
                     cout << "hist_name not found, continue" << endl;
+                    cout << hist_name << endl;
+                    cout << hist_name_reco << endl;
+
                     continue;
                 }
                 auto h1 = (TH1F*)dir_py8->Get(hist_name.c_str())->Clone();
@@ -349,7 +350,8 @@ void KLambdaCompare( ) {
                 TPad *pad2 = new TPad("pad2", "pad2", 0, 0.05, 1, 0.3);
                 pad2->SetTopMargin(0);
                 pad2->SetBottomMargin(0.2);
-                pad2->SetGridx(); // vertical grid
+                //pad2->SetGridx(); // vertical grid
+                pad2->SetGridy(); // horizontal grid
                 h1->GetXaxis()->SetTitle("");
                 h1->GetYaxis()->SetTitle("Events");
                 pad2->Draw();

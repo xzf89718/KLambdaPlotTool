@@ -34,11 +34,11 @@ void GenerateKLambaSamples(const double KLambda)
     using std::clog;
     using std::pow;
     // Base not reweight!
-   //  if (KLambda == 1.0 || KLambda == 0.0 || KLambda == 20.0)
-   //  {
-   //      clog << "KL equals to one of the base, skip KLambda = " << KLambda << endl;
-   //      return;
-   //  }
+    //  if (KLambda == 1.0 || KLambda == 0.0 || KLambda == 20.0)
+    //  {
+    //      clog << "KL equals to one of the base, skip KLambda = " << KLambda << endl;
+    //      return;
+    //  }
 
     // A kindly remind here: dure to the limit of std:to_string, this program cant handle 
     // input more than 5 digit decimal
@@ -131,8 +131,11 @@ void GenerateKLambaSamples(const double KLambda)
     base_info->Branch("base2", &base2, "base2/D");
     base_info->Branch("base3", &base3, "base3/D");
     base_info->Fill();
-    output_file->Write("base_info");
+#ifdef DEBUG_KLREWEIGT 
 
+#else
+    output_file->Write("base_info");
+#endif
     // Now only consider Preselection
     // vector<std::string> Dir_names;
     std::string dirName("Preselection");
@@ -254,7 +257,7 @@ void GenerateKLambaSamples(const double KLambda)
 
 #ifdef DEBUG_KLREWEIGT
             // here i want to show the error propagation!
-            auto c2 = new TCanvas("c2", "c2", 800*1.5, 800*1.5);
+            auto c2 = new TCanvas("c2", "c2", 800*1.5, 600*1.5);
             //gROOT->SetStyle(0);
             // Get reweighted from basefile (truth-level) 
             auto hist_name_truth = base_names.at("base") + string_KLambda + "from1p0" + "_" + *iter_region + "_" + *iter_variable;
@@ -287,24 +290,40 @@ void GenerateKLambaSamples(const double KLambda)
             // XAxis for TGraph
             auto x_for_tgraph = new float[NBinX];
             for (auto i = 0; i < NBinX; i++)
-            {
+            {   
                 error_0[i]= h0->GetBinError(i);
                 error_1[i] = h1->GetBinError(i);
                 bincontent_1[i] = h1->GetBinContent(i);
                 error_20[i] = h20->GetBinError(i);
                 if(h_truth)
-                {
-                    error_truth[i] = h_truth->GetBinError(i);
-                    bincontent_truth[i] = h_truth->GetBinContent(i);
+                {   
+                    auto content_truth = h_truth->GetBinContent(i);
+                    if (content_truth > 0.0)
+                    {
+                        error_truth[i] = (h_truth->GetBinError(i)) / (content_truth) ;
+                    }
+                    else
+                    {
+                        error_truth[i] = -1;
+                    }
+                    bincontent_truth[i] = h_truth->GetBinContent(i) ;
                 }
                 // Get error of reweight one
-                error_reweight[i] = h_cup_2->GetBinError(i);
+                auto content_cup_2 = h_cup_2->GetBinContent(i);
+                if (content_cup_2 > 0.0)
+                {
+                error_reweight[i] = (h_cup_2->GetBinError(i)) / content_cup_2;
+                }
+                else
+                {
+                    error_reweight[i] = -1;
+                }
                 // try to recalculate!
                 error_calculated[i] = std::sqrt(pow(error_0[i] * k1, 2) + pow(error_1[i] * k2, 2) + pow(error_20[i] * k3, 2));
                 x_for_tgraph[i] = h0->GetBinCenter(i);
 
                 //cout << "cal error: " <<error_calculated[i]<< " reweighted error: "<< error_reweight[i] \
-                    << " KL=1 error: " << error_1[i] << " propagate: " << bincontent_truth[i] / bincontent_1[i] \
+                << " KL=1 error: " << error_1[i] << " propagate: " << bincontent_truth[i] / bincontent_1[i] \
                     <<" is it fit my assumption?" << (bincontent_truth[i]/bincontent_truth[i] * error_1[i] - error_truth[i]  < 0.00001) << endl;
 
             }
@@ -326,7 +345,7 @@ void GenerateKLambaSamples(const double KLambda)
             //g20->Draw("SAME");
             // Let's try multigraph
             //
-            auto mg = new TMultiGraph("mg", "");
+            auto mg = new TMultiGraph("mg", "Shape_only");
             if(h_truth)
             {
                 mg->Add(gtruth);
@@ -367,8 +386,11 @@ void GenerateKLambaSamples(const double KLambda)
             delete []bincontent_1;
             delete c2;
 #endif
+#ifdef DEBUG_KLREWEIGT
 
+#else
             h_cup_2->Write();
+#endif
             delete h0;
             delete h1;
             delete h20;
