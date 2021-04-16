@@ -10,3 +10,4 @@
 *.zip
 /test_signals
 /compare_truthreweights
+.vscode

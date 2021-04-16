@@ -258,8 +258,7 @@ void GenerateKLambaSamples(const double KLambda)
                     auto h0 = (TH1F *)dir_input->Get(h0_name.c_str());
                     auto h1 = (TH1F *)dir_input->Get(h1_name.c_str());
                     auto h20 = (TH1F *)dir_input->Get(h20_name.c_str());
-                    
-                     
+
                     if (!h0)
                     {
                         clog << "Warning: Cant find base histogram h0" << endl;
@@ -514,7 +513,7 @@ void GenerateKLambaSamples(const double KLambda)
                     auto h0 = (TH1F *)dir_input->Get(h0_name.c_str());
                     auto h1 = (TH1F *)dir_input->Get(h1_name.c_str());
                     auto h20 = (TH1F *)dir_input->Get(h20_name.c_str());
-                    
+
                     if (!h0)
                     {
                         clog << "Warning: Cant find base histogram h0" << endl;
@@ -616,8 +615,7 @@ void GenerateKLambaSamples(const double KLambda)
                     auto h0 = (TH1F *)dir_input->Get(h0_name.c_str());
                     auto h1 = (TH1F *)dir_input->Get(h1_name.c_str());
                     auto h20 = (TH1F *)dir_input->Get(h20_name.c_str());
-                    
-                
+
                     if (!h0)
                     {
                         clog << "Warning: Cant find base histogram h0" << endl;

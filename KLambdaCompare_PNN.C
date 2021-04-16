@@ -37,153 +37,13 @@
 
 
 #define DEBUG_COMPARE 1
-std::string transformFloat(float KLambda){
-    // input: any float KLambda
-    // output: somethin like (string) 1p0
-
-    // A kindly remind here: dure to the limit of std:to_string, this program cant handle 
-    // input more than 5 digit decimal
-    // Transform input KLambda to string form, such as 1p00000
-    std::string string_KLambda = std::to_string(KLambda);
-    auto index_of_point = string_KLambda.find(".");
-    if(index_of_point != -1)
-        string_KLambda.replace(index_of_point, 1, "p");
-    //for now, we only need 2 digit decimal
-    //string_KLambda = string_KLambda.substr(0, string_KLambda.length() - 4);
-    // now, we noly need 1 digit decimal
-    string_KLambda = string_KLambda.substr(0, string_KLambda.length() - 5);
-    //if KLambda<0, we need to substitute the "-" with "n"
-    auto index_of_minus = string_KLambda.find("-");
-    if (index_of_minus != -1)
-        string_KLambda.replace(index_of_minus, 1, "n");
-
-    return string_KLambda;
-
-}
-
-void DrawRatioPlot(TH1F* h1, TH1F* h2){
-    //cout<< h1->GetNbinsX() <<endl;
-    h1->Rebin(rebin_factors.at(*iter_variable));
-    h2->Rebin(rebin_factors.at(*iter_variable));
-    // Define the Canvas
-    TCanvas *c = new TCanvas("c", "canvas", 800, 800);
-    gROOT->SetStyle("ATLAS");
-    gStyle->SetOptStat(0);
-    // Upper plot will be in pad1
-    TPad *pad1 = new TPad("pad1", "pad1", 0, 0.3, 1, 1.0);
-    pad1->SetBottomMargin(1); // Upper and lower plot are joined
-    // pad1->SetGridx();         // Vertical grid
-    pad1->Draw();             // Draw the upper pad: pad1
-    pad1->cd();               // pad1 becomes the current pad
-    h1->SetStats(0);          // No statistics on upper plot
-    h1->Draw("HIST E1");               // Draw h1
-    h2->Draw("HIST E1 SAME");         // Draw h2 on top of h1
-    // Create Legend for histogram!
-    //auto legend = new TLegend(0.7, 0.9, 0.48, 0.9);
-    auto legend = new TLegend(0.75, 0.8, 0.95, 0.95);
-    gStyle->SetLegendTextSize(0.02);
-    legend->AddEntry(h1, "truth_level");
-    legend->AddEntry(h2, "combine_at_reco_level");
-    legend->Draw();
-
-
-    // Do not draw the Y axis label on the upper plot and redraw a small
-    // axis instead, in order to avoid the first label (0) to be clipped.
-    //h1->GetYaxis()->SetLabelSize(0.);
-    // TGaxis *axis = new TGaxis( -5, 20, -5, 220, 20,220,510,"");
-    // axis->SetLabelFont(43); // Absolute font size in pixel (precision 3)
-    // axis->SetLabelSize(15);
-    // axis->Draw();
-
-    // lower plot will be in pad
-    c->cd();          // Go back to the main canvas before defining pad2
-    TPad *pad2 = new TPad("pad2", "pad2", 0, 0.05, 1, 0.3);
-    pad2->SetTopMargin(0);
-    pad2->SetBottomMargin(0.2);
-    //pad2->SetGridx(); // vertical grid
-    pad2->SetGridy(); // horizontal grid
-    h1->GetXaxis()->SetTitle("");
-    h1->GetYaxis()->SetTitle("Events");
-    pad2->Draw();
-    pad2->cd();       // pad2 becomes the current pad
-
-    // Define the ratio plot
-    TH1F *h3 = (TH1F*)h1->Clone("h3");
-    h3->SetLineColor(kBlack);
-    h3->SetMinimum(0.8);  // Define Y ..
-    h3->SetMaximum(1.35); // .. range
-    h3->Sumw2();
-    h3->SetStats(0);      // No statistics on lower plot
-    h3->Divide(h2);
-    h3->SetMarkerStyle(21);
-    h3->Draw("ep");       // Draw the ratio plot
-
-    // h1 settings
-    h1->SetLineColor(kBlue+1);
-    h1->SetLineWidth(2);
-
-    // Y axis h1 plot settings
-    h1->GetYaxis()->SetTitleSize(20);
-    h1->GetYaxis()->SetTitleFont(43);
-    h1->GetYaxis()->SetTitleOffset(1.55);
-
-    // h2 settings
-    h2->SetLineColor(kRed);
-    h2->SetLineWidth(2);
-
-    // Ratio plot (h3) settings
-    h3->SetTitle(""); // Remove the ratio title
-
-    // Y axis ratio plot settings
-    h3->GetYaxis()->SetTitle("ratio h1/h2 ");
-    h3->GetYaxis()->SetNdivisions(505);
-    h3->GetYaxis()->SetTitleSize(20);
-    h3->GetYaxis()->SetTitleFont(43);
-    h3->GetYaxis()->SetTitleOffset(1.55);
-    h3->GetYaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
-    h3->GetYaxis()->SetLabelSize(15);
-
-    // X axis ratio plot settings
-    if(*iter_variable == "mHH" || *iter_variable == "mMMC" || *iter_variable == "mHH")
-    {
-        h3->GetXaxis()->SetTitle((*iter_variable + "[GeV]").c_str());
-    }
-    else
-    {
-        h3->GetXaxis()->SetTitle((*iter_variable).c_str());
-    }
-    h3->GetXaxis()->SetTitleSize(20);
-    h3->GetXaxis()->SetTitleFont(43);
-    h3->GetXaxis()->SetTitleOffset(4.);
-    h3->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
-    h3->GetXaxis()->SetLabelSize(15);
-
-    gPad->Update();
-    c->SaveAs((output_path + "/" + hist_name + ".png").c_str());
-    delete h1;
-    delete h2;
-    delete h3;
-    delete pad1;
-    delete pad2;
-
-    delete c;
-
-}
-
-std::vector<std::string>* GetRegions(){
-}
-
-std::vector<std::string>* GetVariables(){
-}
-
-std::map<std::string, int>* GetRebinFactors(){
-}
-
-std::vector<std::string>* GetBaseNames(){
-}
-
-std::map<std::string, std::string>* GetRecoBaseName(){
-}
+std::string transformFloat(float KLambda);
+void DrawRatioPlot(TH1F* h1, TH1F* h2);
+std::vector<std::string>* GetVariables();
+std::vector<std::string>* GetRegions();
+std::map<std::string, int>* GetRebinFactors();
+std::vector<std::string>* GetBaseNames();
+std::map<std::string, std::string>* GetRecoBaseName();
 
 void KLambdaCompare( ) {
     // Define two gaussian histograms. Note the X and Y title are defined
@@ -197,56 +57,16 @@ void KLambdaCompare( ) {
     //std::string Dir = {"Preselection"};
     std::string input_dir = {"BDTScorePreselection"};
     auto KLReweight_py8 = new TFile("./output/KLReweight_py8_moreKLSignals.root", "READ");
-    //auto KLReweight_herwig7 = new TFile("./output/KLReweight.root", "READ");
     auto KLReweight_Reco = new TFile("./output/KLRecoReweigt_py8.root", "READ");
     std::string output_path = {"./plotsForGenerateKL"};
     // Initialize STL containers, wich includes names of histograms
-    std::vector<std::string>* regions;
-    std::vector<std::string>* variables;
-    std::map<std::string, int>* rebin_factors;
-    std::vector<std::string>* base_names;
-    std::map<std::string, std::string>* Reco_Basename;
+    std::vector<std::string>* regions = GetRegions();
+    std::vector<std::string>* variables = GetVariables();
+    std::map<std::string, int>* rebin_factors = GetRebinFactors();
+    std::vector<std::string>* base_names = GetBaseNames();
+    std::map<std::string, std::string>* Reco_Basename = GetRecoBaseName();
 
-    // Add regions
-    regions.push_back("2tag2pjet_0ptv_LL_OS");
-    // Add variables
-    variables.push_back("mBB");
-    variables.push_back("mMMC");
-    variables.push_back("mHH");
-    variables.push_back("mHHScaled");
-    variables.push_back("dRBB");
-    variables.push_back("pTBB");
-    variables.push_back("dRTauTau");
-    variables.push_back("pTTauTau");
-    variables.push_back("dPhiBBTauTau");
-    variables.push_back("dRBBTauTau");
-    variables.push_back("pTBalance");
-    variables.push_back("MET");
-    variables.push_back("nJets");
-    variables.push_back("Yield");
-    variables.push_back("metSig");
-    variables.push_back("metSigPU");
-    variables.push_back("Jet0Pt");
-    variables.push_back("Jet1Pt");
-    variables.push_back("pTB0");
-    variables.push_back("pTB1");
-    variables.push_back("LeadJetPt");
-    variables.push_back("SubleadJetPt");
-    variables.push_back("LeadJetEta");
-    variables.push_back("SubleadJetEta");
-    variables.push_back("Jet0Eta");
-    variables.push_back("Jet1Eta");
-    variables.push_back("Tau0Pt");
-    variables.push_back("Tau1Pt");
-    variables.push_back("Tau0Eta");
-    variables.push_back("Tau1Eta");
-    variables.push_back("Tau0Ntrk");
-    variables.push_back("Tau1Ntrk");
-    variables.push_back("dPhiTauTau");
-    variables.push_back("SMBDT");
-    variables.push_back("SMNN");
-    variables.push_back("PNN");
-
+        
 
     // Add rebin factors
     rebin_factors.insert(std::pair<std::string, int>("mBB", 10));
@@ -346,4 +166,194 @@ void KLambdaCompare( ) {
     //KLReweight_herwig7->Close();
 }
 
+std::string transformFloat(float KLambda){
+    // input: any float KLambda
+    // output: somethin like (string) 1p0
+
+    // A kindly remind here: dure to the limit of std:to_string, this program cant handle 
+    // input more than 5 digit decimal
+    // Transform input KLambda to string form, such as 1p00000
+    std::string string_KLambda = std::to_string(KLambda);
+    auto index_of_point = string_KLambda.find(".");
+    if(index_of_point != -1)
+        string_KLambda.replace(index_of_point, 1, "p");
+    //for now, we only need 2 digit decimal
+    //string_KLambda = string_KLambda.substr(0, string_KLambda.length() - 4);
+    // now, we noly need 1 digit decimal
+    string_KLambda = string_KLambda.substr(0, string_KLambda.length() - 5);
+    //if KLambda<0, we need to substitute the "-" with "n"
+    auto index_of_minus = string_KLambda.find("-");
+    if (index_of_minus != -1)
+        string_KLambda.replace(index_of_minus, 1, "n");
+
+    return string_KLambda;
+
+}
+
+void DrawRatioPlot(TH1F* h1, TH1F* h2){
+    //cout<< h1->GetNbinsX() <<endl;
+    h1->Rebin(rebin_factors.at(*iter_variable));
+    h2->Rebin(rebin_factors.at(*iter_variable));
+    // Define the Canvas
+    TCanvas *c = new TCanvas("c", "canvas", 800, 800);
+    gROOT->SetStyle("ATLAS");
+    gStyle->SetOptStat(0);
+    // Upper plot will be in pad1
+    TPad *pad1 = new TPad("pad1", "pad1", 0, 0.3, 1, 1.0);
+    pad1->SetBottomMargin(1); // Upper and lower plot are joined
+    // pad1->SetGridx();         // Vertical grid
+    pad1->Draw();             // Draw the upper pad: pad1
+    pad1->cd();               // pad1 becomes the current pad
+    h1->SetStats(0);          // No statistics on upper plot
+    h1->Draw("HIST E1");               // Draw h1
+    h2->Draw("HIST E1 SAME");         // Draw h2 on top of h1
+    // Create Legend for histogram!
+    //auto legend = new TLegend(0.7, 0.9, 0.48, 0.9);
+    auto legend = new TLegend(0.75, 0.8, 0.95, 0.95);
+    gStyle->SetLegendTextSize(0.02);
+    legend->AddEntry(h1, "truth_level");
+    legend->AddEntry(h2, "combine_at_reco_level");
+    legend->Draw();
+
+
+    // Do not draw the Y axis label on the upper plot and redraw a small
+    // axis instead, in order to avoid the first label (0) to be clipped.
+    //h1->GetYaxis()->SetLabelSize(0.);
+    // TGaxis *axis = new TGaxis( -5, 20, -5, 220, 20,220,510,"");
+    // axis->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+    // axis->SetLabelSize(15);
+    // axis->Draw();
+
+    // lower plot will be in pad
+    c->cd();          // Go back to the main canvas before defining pad2
+    TPad *pad2 = new TPad("pad2", "pad2", 0, 0.05, 1, 0.3);
+    pad2->SetTopMargin(0);
+    pad2->SetBottomMargin(0.2);
+    //pad2->SetGridx(); // vertical grid
+    pad2->SetGridy(); // horizontal grid
+    h1->GetXaxis()->SetTitle("");
+    h1->GetYaxis()->SetTitle("Events");
+    pad2->Draw();
+    pad2->cd();       // pad2 becomes the current pad
+
+    // Define the ratio plot
+    TH1F *h3 = (TH1F*)h1->Clone("h3");
+    h3->SetLineColor(kBlack);
+    h3->SetMinimum(0.8);  // Define Y ..
+    h3->SetMaximum(1.35); // .. range
+    h3->Sumw2();
+    h3->SetStats(0);      // No statistics on lower plot h3->Divide(h2);
+    h3->SetMarkerStyle(21);
+    h3->Draw("ep");       // Draw the ratio plot
+
+    // h1 settings
+    h1->SetLineColor(kBlue+1);
+    h1->SetLineWidth(2);
+
+    // Y axis h1 plot settings
+    h1->GetYaxis()->SetTitleSize(20);
+    h1->GetYaxis()->SetTitleFont(43);
+    h1->GetYaxis()->SetTitleOffset(1.55);
+
+    // h2 settings
+    h2->SetLineColor(kRed);
+    h2->SetLineWidth(2);
+
+    // Ratio plot (h3) settings
+    h3->SetTitle(""); // Remove the ratio title
+
+    // Y axis ratio plot settings
+    h3->GetYaxis()->SetTitle("ratio h1/h2 ");
+    h3->GetYaxis()->SetNdivisions(505);
+    h3->GetYaxis()->SetTitleSize(20);
+    h3->GetYaxis()->SetTitleFont(43);
+    h3->GetYaxis()->SetTitleOffset(1.55);
+    h3->GetYaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+    h3->GetYaxis()->SetLabelSize(15);
+
+    // X axis ratio plot settings
+    if(*iter_variable == "mHH" || *iter_variable == "mMMC" || *iter_variable == "mHH")
+    {
+        h3->GetXaxis()->SetTitle((*iter_variable + "[GeV]").c_str());
+    }
+    else
+    {
+        h3->GetXaxis()->SetTitle((*iter_variable).c_str());
+    }
+    h3->GetXaxis()->SetTitleSize(20);
+    h3->GetXaxis()->SetTitleFont(43);
+    h3->GetXaxis()->SetTitleOffset(4.);
+    h3->GetXaxis()->SetLabelFont(43); // Absolute font size in pixel (precision 3)
+    h3->GetXaxis()->SetLabelSize(15);
+
+    gPad->Update();
+    c->SaveAs((output_path + "/" + hist_name + ".png").c_str());
+    delete h1;
+    delete h2;
+    delete h3;
+    delete pad1;
+    delete pad2;
+
+    delete c;
+
+}
+
+std::vector<std::string>* GetRegions(){
+    auto vector = new std::vector<std::string>;
+    // Add regions
+    vector->push_back("2tag2pjet_0ptv_LL_OS");
+
+    return vector;
+}
+
+std::vector<std::string>* GetVariables(){
+    auto vector = new std::vector<std::string>;
+    //Add variables
+    variables.push_back("mBB");
+    variables.push_back("mMMC");
+    variables.push_back("mHH");
+    variables.push_back("mHHScaled");
+    variables.push_back("dRBB");
+    variables.push_back("pTBB");
+    variables.push_back("dRTauTau");
+    variables.push_back("pTTauTau");
+    variables.push_back("dPhiBBTauTau");
+    variables.push_back("dRBBTauTau");
+    variables.push_back("pTBalance");
+    variables.push_back("MET");
+    variables.push_back("nJets");
+    variables.push_back("Yield");
+    variables.push_back("metSig");
+    variables.push_back("metSigPU");
+    variables.push_back("Jet0Pt");
+    variables.push_back("Jet1Pt");
+    variables.push_back("pTB0");
+    variables.push_back("pTB1");
+    variables.push_back("LeadJetPt");
+    variables.push_back("SubleadJetPt");
+    variables.push_back("LeadJetEta");
+    variables.push_back("SubleadJetEta");
+    variables.push_back("Jet0Eta");
+    variables.push_back("Jet1Eta");
+    variables.push_back("Tau0Pt");
+    variables.push_back("Tau1Pt");
+    variables.push_back("Tau0Eta");
+    variables.push_back("Tau1Eta");
+    variables.push_back("Tau0Ntrk");
+    variables.push_back("Tau1Ntrk");
+    variables.push_back("dPhiTauTau");
+    variables.push_back("SMBDT");
+    variables.push_back("SMNN");
+    variables.push_back("PNN");
+
+}
+
+std::map<std::string, int>* GetRebinFactors(){
+}
+
+std::vector<std::string>* GetBaseNames(){
+}
+
+std::map<std::string, std::string>* GetRecoBaseName(){
+}
 
