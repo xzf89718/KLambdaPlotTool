@@ -24,10 +24,8 @@
 /* Usage: HistNameManager hnm = HistNameManager();
         hnm.SetDefaultBaseName();
         hnm.SetDefaultRegions();
-        hnm.SetDefaultSamples();
         hnm.SetDefaultVariables();
         hnm.SetDirName("Preselection");
-
 */
 
 using std::clog;
