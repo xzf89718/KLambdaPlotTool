@@ -16,7 +16,7 @@ using std::vector;
 
 HistNameManager::HistNameManager()
 {
-    m_vec_samples = vector<string>();
+    // m_vec_samples = vector<string>();
     m_vec_regions = vector<string>();
     m_vec_variables = vector<string>();
     // contaniers for base samples name in inputfile
@@ -37,11 +37,13 @@ void HistNameManager::SetDirName(string directoryname)
 {
     m_str_directoryname = directoryname;
 }
+
 // Add method
-void HistNameManager::AddSample(string sample)
-{
-    m_vec_samples.push_back(sample);
-}
+// void HistNameManager::AddSample(string sample)
+// {
+//     m_vec_samples.push_back(sample);
+// }
+
 void HistNameManager::AddRegion(string region)
 {
     m_vec_regions.push_back(region);
@@ -126,4 +128,13 @@ void HistNameManager::SetDefaultPNNVariables()
     {
         AddVariable("PNN" + *pnn_klambda);
     }
+}
+
+void HistNameManager::SetDefaultBDTVariables(){
+    AddVariable("SMBDT");
+}
+
+void HistNameManager::SetDefaultNNVariables(){
+    AddVariable("SMNN");
+    AddVariable("SMNNNonNested");
 }

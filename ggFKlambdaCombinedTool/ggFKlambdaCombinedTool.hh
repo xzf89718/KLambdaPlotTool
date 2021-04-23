@@ -42,8 +42,8 @@ private:
     TFile *m_output_file;
 
     // input & output directory
-    TDirectory *input_dir;
-    TDirectory *output_dir;
+    TDirectory *m_input_dir;
+    TDirectory *m_output_dir;
 
     // Base and combined histogram
     TH1F *m_h0;
@@ -52,25 +52,25 @@ private:
     TH1F *m_combined;
 
     // contaniner for HistNameManager, manage histname!
-    vector<HistNameManager> m_vec_HistNameManagers;
+    vector<HistNameManager *> m_vec_HistNameManagers;
 
     // Combine and write to output file
-    void CombineAndWrite(float klambda);
+    void CombineOneHist(float klambda);
 
     // Get base hists and check them
-    bool GetHistAndCheck();
-    // default
-    ggFKlambdaCombinedTool();
+    bool GetHistAndCheck(const string &h0_name, const string &h1_name, const string &h20_name);
 
 public:
     // Constructor
+    // default
+    ggFKlambdaCombinedTool();
     // deconstructor
     ~ggFKlambdaCombinedTool();
     // construct really use
     ggFKlambdaCombinedTool(const string &input_file, const string &output_file);
 
     // Add HistNameManager
-    void AddHistNameManager(HistNameManager hnm);
+    void AddHistNameManager(HistNameManager *hnm) { m_vec_HistNameManagers.push_back(hnm); };
 
     // Get Methods
 
@@ -78,7 +78,7 @@ public:
     // TH1F *GetCombinedHist() { return m_combined; };
 
     // Loop over all things in m_vec_HistNameManagers
-    void LoopOverHistNameManagers();
+    void LoopOverHistNameManagers(float klambda);
     // Set Methods
 
     // Set default setup

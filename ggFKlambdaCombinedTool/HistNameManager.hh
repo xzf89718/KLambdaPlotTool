@@ -39,7 +39,7 @@ class HistNameManager
 
 private:
     // containers for samples, regions, variables names
-    vector<string> m_vec_samples;
+    // vector<string> m_vec_samples;
     vector<string> m_vec_regions;
     vector<string> m_vec_variables;
     // contaniers for base samples name in inputfile
@@ -54,7 +54,7 @@ public:
     // Set Methods
     void SetDirName(string directoryname);
     // Add method
-    void AddSample(string sample);
+    // void AddSample(string sample);
     void AddRegion(string region);
     void AddVariable(string variable);
 
@@ -63,7 +63,7 @@ public:
     void AddBasename(string tag, string base_name);
 
     // Get method
-    const vector<string> &GetSamples() const { return m_vec_samples; }
+    // const vector<string> &GetSamples() const { return m_vec_samples; }
     const vector<string> &GetRegions() const { return m_vec_regions; }
     const vector<string> &GetVariables() const { return m_vec_variables; }
     const map<string, string> &GetBaseMap() const { return m_map_basenames; }
@@ -75,6 +75,8 @@ public:
     void SetDefaultBaseName();
     
     void SetDefaultPNNVariables();
+    void SetDefaultBDTVariables();
+    void SetDefaultNNVariables();
 };
 
 #endif
