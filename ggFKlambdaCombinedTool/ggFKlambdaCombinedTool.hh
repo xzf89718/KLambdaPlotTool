@@ -45,17 +45,27 @@ private:
     TDirectory *m_input_dir;
     TDirectory *m_output_dir;
 
+    // debug
+    bool m_debug;
     // Base and combined histogram
     TH1F *m_h0;
     TH1F *m_h1;
     TH1F *m_h20;
     TH1F *m_combined;
 
+        
+    // reweighted hist name
+    string m_reweighted_hist_name;
     // contaniner for HistNameManager, manage histname!
     vector<HistNameManager *> m_vec_HistNameManagers;
 
     // Combine and write to output file
     void CombineOneHist(float klambda);
+
+    // Delete base and combined histrograms
+    void DeleteHists();
+    // Draw all plots!
+    // void DrawDebugPlots();
 
     // Get base hists and check them
     bool GetHistAndCheck(const string &h0_name, const string &h1_name, const string &h20_name);
@@ -80,7 +90,8 @@ public:
     // Loop over all things in m_vec_HistNameManagers
     void LoopOverHistNameManagers(float klambda);
     // Set Methods
-
+    // Set debug
+    void SetDebug(bool debug_or_not);
     // Set default setup
     void SetDefaultHistNameManager();
 

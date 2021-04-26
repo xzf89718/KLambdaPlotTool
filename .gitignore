@@ -11,3 +11,5 @@
 /test_signals
 /compare_truthreweights
 .vscode
+*.log
+*.err

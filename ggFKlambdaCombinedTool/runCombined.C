@@ -42,7 +42,7 @@ void runCombined(){
     // But it is really recommended modify in SetDefaultHistNameManager in ggFKlambdaCombinedTool, and SetDefaultXXX in HistNameManager!
 
 
-    for (float klambda = -20.0; klambda <= -19.0; klambda = klambda + 0.2){
+    for (float klambda = -20.0; klambda <= 20.0; klambda = klambda + 0.2){
         combine_tool.LoopOverHistNameManagers(klambda);
     }
 
