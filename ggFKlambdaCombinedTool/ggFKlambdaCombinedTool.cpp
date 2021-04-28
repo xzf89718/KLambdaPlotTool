@@ -36,8 +36,8 @@ ggFKlambdaCombinedTool::ggFKlambdaCombinedTool()
 
 ggFKlambdaCombinedTool::~ggFKlambdaCombinedTool()
 {
-    delete m_input_dir;
-    delete m_output_dir;
+    // delete m_input_dir;
+    // delete m_output_dir;
     m_input_file->Close();
     m_output_file->Close();
     delete m_input_file;
@@ -363,6 +363,7 @@ void ggFKlambdaCombinedTool::LoopOverHistNameManagers(float klambda)
         if (!m_input_dir)
         {
             clog << "ggFKlambdaCombinedTool::LoopOverHistNameManagers: ERROR: Input directory not exist, skip and check the HistNameManager DirName! Skip." << endl;
+            continue;
         }
 
         m_output_dir = (TDirectory *)m_output_file->Get(str_dirname.c_str());
@@ -418,6 +419,8 @@ void ggFKlambdaCombinedTool::LoopOverHistNameManagers(float klambda)
 
         // Go back to top of the TDirectory
         m_output_file->cd("../");
+        delete m_input_dir;
+        delete m_output_dir;
     }
 }
 
